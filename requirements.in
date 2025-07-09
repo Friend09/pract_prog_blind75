@@ -1,0 +1,5 @@
+ipykernel
+pip-tools
+pandas
+matplotlib
+pre-commit
