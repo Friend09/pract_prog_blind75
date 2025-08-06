@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trie Algorithm Step-by-Step</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        h2 {
+            color: #34495e;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+        .step {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            position: relative;
+        }
+        .step-header {
+            background: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        .trie-visual {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .node {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #3498db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            background: white;
+            position: relative;
+        }
+        .root-node {
+            background: #e74c3c;
+            color: white;
+            border-color: #c0392b;
+        }
+        .word-end {
+            background: #27ae60;
+            color: white;
+            border-color: #229954;
+        }
+        .current-node {
+            background: #f39c12;
+            color: white;
+            border-color: #e67e22;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .arrow {
+            font-size: 24px;
+            color: #3498db;
+            font-weight: bold;
+        }
+        .code-step {
+            background: #f8f9fa;
+            color: #2c3e50;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 14px;
+            margin: 15px 0;
+            line-height: 1.6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .code-step .comment {
+            color: #6c757d;
+            font-style: italic;
+        }
+        .code-step .keyword {
+            color: #007bff;
+            font-weight: bold;
+        }
+        .code-step .string {
+            color: #28a745;
+        }
+        .code-step .variable {
+            color: #e83e8c;
+        }
+        .highlight {
+            background: #f1c40f;
+            padding: 2px 4px;
+            border-radius: 3px;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        .variable-state {
+            background: #e8f8f5;
+            border-left: 4px solid #27ae60;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        .tree-structure {
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #dee2e6;
+            overflow-x: auto;
+        }
+        .search-demo {
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .success {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .failure {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .legend-node {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌳 Trie Algorithm: Step-by-Step with "bye" and "byte"</h1>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-node root-node" style="width:30px;height:30px;border:2px solid #c0392b;"></div>
+                <span>Root Node</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-node" style="width:30px;height:30px;border:2px solid #3498db;background:white;"></div>
+                <span>Regular Node</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-node word-end" style="width:30px;height:30px;border:2px solid #229954;"></div>
+                <span>Word End (is_word=True)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-node current-node" style="width:30px;height:30px;border:2px solid #e67e22;"></div>
+                <span>Current Node</span>
+            </div>
+        </div>
+
+        <h2>🚀 Initial State</h2>
+        <div class="step">
+            <div class="step-header">Step 0: Initialize Empty Trie</div>
+            <div class="code-step">
+<span class="variable">trie</span> = Trie()  <span class="comment"># Creates root node</span><br>
+<span class="variable">root</span> = TrieNode()  <span class="comment"># children={}, is_word=False</span>
+            </div>
+            <div class="trie-visual">
+                <div class="node root-node">ROOT</div>
+            </div>
+            <div class="variable-state">
+                <strong>State:</strong> node = root, children = {}, is_word = False
+            </div>
+        </div>
+
+        <h2>📝 Inserting "bye"</h2>
+        
+        <div class="step">
+            <div class="step-header">Step 1: Insert 'b' from "bye"</div>
+            <div class="code-step">
+<span class="variable">node</span> = <span class="keyword">self</span>.root  <span class="comment"># Start at root</span><br>
+<span class="variable">c</span> = <span class="string">'b'</span>  <span class="comment"># First character</span><br>
+<span class="keyword">if</span> <span class="variable">c</span> <span class="keyword">not in</span> <span class="variable">node</span>.children:  <span class="comment"># 'b' not in {} → True</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="variable">node</span>.children[<span class="variable">c</span>] = TrieNode()  <span class="comment"># Create new node for 'b'</span><br>
+<span class="variable">node</span> = <span class="variable">node</span>.children[<span class="variable">c</span>]  <span class="comment"># Move to 'b' node</span>
+            </div>
+            <div class="trie-visual">
+                <div class="node root-node">ROOT</div>
+                <div class="arrow">→</div>
+                <div class="node current-node">b</div>
+            </div>
+            <div class="variable-state">
+                <strong>Current node:</strong> 'b' node<br>
+                <strong>Root children:</strong> {'b': TrieNode}<br>
+                <strong>'b' node:</strong> children={}, is_word=False
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">Step 2: Insert 'y' from "bye"</div>
+            <div class="code-step">
+<span class="variable">c</span> = <span class="string">'y'</span>  <span class="comment"># Second character</span><br>
+<span class="keyword">if</span> <span class="variable">c</span> <span class="keyword">not in</span> <span class="variable">node</span>.children:  <span class="comment"># 'y' not in {} → True</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="variable">node</span>.children[<span class="variable">c</span>] = TrieNode()  <span class="comment"># Create new node for 'y'</span><br>
+<span class="variable">node</span> = <span class="variable">node</span>.children[<span class="variable">c</span>]  <span class="comment"># Move to 'y' node</span>
+            </div>
+            <div class="trie-visual">
+                <div class="node root-node">ROOT</div>
+                <div class="arrow">→</div>
+                <div class="node">b</div>
+                <div class="arrow">→</div>
+                <div class="node current-node">y</div>
+            </div>
+            <div class="variable-state">
+                <strong>Current node:</strong> 'y' node<br>
+                <strong>'b' node children:</strong> {'y': TrieNode}<br>
+                <strong>'y' node:</strong> children={}, is_word=False
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">Step 3: Insert 'e' from "bye" and mark as word</div>
+            <div class="code-step">
+<span class="variable">c</span> = <span class="string">'e'</span>  <span class="comment"># Third character</span><br>
+<span class="keyword">if</span> <span class="variable">c</span> <span class="keyword">not in</span> <span class="variable">node</span>.children:  <span class="comment"># 'e' not in {} → True</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="variable">node</span>.children[<span class="variable">c</span>] = TrieNode()  <span class="comment"># Create new node for 'e'</span><br>
+<span class="variable">node</span> = <span class="variable">node</span>.children[<span class="variable">c</span>]  <span class="comment"># Move to 'e' node</span><br>
+<br>
+<span class="comment"># All characters processed, mark as end of word</span><br>
+<span class="variable">node</span>.is_word = <span class="keyword">True</span>
+            </div>
+            <div class="trie-visual">
+                <div class="node root-node">ROOT</div>
+                <div class="arrow">→</div>
+                <div class="node">b</div>
+                <div class="arrow">→</div>
+                <div class="node">y</div>
+                <div class="arrow">→</div>
+                <div class="node word-end">e</div>
+            </div>
+            <div class="variable-state">
+                <strong>Final state after "bye":</strong><br>
+                <strong>'e' node:</strong> children={}, <span class="highlight">is_word=True</span>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">Trie State After Inserting "bye"</div>
+            <div class="tree-structure">
+root (is_word=False)
+└── b (is_word=False)
+    └── y (is_word=False)  
+        └── e (is_word=True) ← "bye" ends here
+            </div>
+        </div>
+
+        <h2>📝 Inserting "byte"</h2>
+
+        <div class="step">
+            <div class="step-header">Step 4: Insert 'b' from "byte"</div>
+            <div class="code-step">
+<span class="variable">node</span> = <span class="keyword">self</span>.root  <span class="comment"># Start at root again</span><br>
+<span class="variable">c</span> = <span class="string">'b'</span>  <span class="comment"># First character</span><br>
+<span class="keyword">if</span> <span class="variable">c</span> <span class="keyword">not in</span> <span class="variable">node</span>.children:  <span class="comment"># 'b' in {'b': TrieNode} → False</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># Don't create new node, 'b' already exists!</span><br>
+<span class="variable">node</span> = <span class="variable">node</span>.children[<span class="variable">c</span>]  <span class="comment"># Move to existing 'b' node</span>
+            </div>
+            <div class="trie-visual">
+                <div class="node root-node">ROOT</div>
+                <div class="arrow">→</div>
+                <div class="node current-node">b</div>
+                <div class="arrow">→</div>
+                <div class="node">y</div>
+                <div class="arrow">→</div>
+                <div class="node word-end">e</div>
+            </div>
+            <div class="variable-state">
+                <strong>Reusing existing 'b' node!</strong><br>
+                <strong>Current node:</strong> existing 'b' node<br>
+                <strong>This is why Tries are space-efficient for common prefixes</strong>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">Step 5: Insert 'y' from "byte"</div>
+            <div class="code-step">
+<span class="variable">c</span> = <span class="string">'y'</span>  <span class="comment"># Second character</span><br>
+<span class="keyword">if</span> <span class="variable">c</span> <span class="keyword">not in</span> <span class="variable">node</span>.children:  <span class="comment"># 'y' in {'y': TrieNode} → False</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># Don't create new node, 'y' already exists!</span><br>
+<span class="variable">node</span> = <span class="variable">node</span>.children[<span class="variable">c</span>]  <span class="comment"># Move to existing 'y' node</span>
+            </div>
+            <div class="trie-visual">
+                <div class="node root-node">ROOT</div>
+                <div class="arrow">→</div>
+                <div class="node">b</div>
+                <div class="arrow">→</div>
+                <div class="node current-node">y</div>
+                <div class="arrow">→</div>
+                <div class="node word-end">e</div>
+            </div>
+            <div class="variable-state">
+                <strong>Reusing existing 'y' node!</strong><br>
+                <strong>Current node:</strong> existing 'y' node<br>
+                <strong>Shared prefix "by" uses same path</strong>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">Step 6: Insert 't' from "byte"</div>
+            <div class="code-step">
+<span class="variable">c</span> = <span class="string">'t'</span>  <span class="comment"># Third character</span><br>
+<span class="keyword">if</span> <span class="variable">c</span> <span class="keyword">not in</span> <span class="variable">node</span>.children:  <span class="comment"># 't' not in {'e': TrieNode} → True</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="variable">node</span>.children[<span class="variable">c</span>] = TrieNode()  <span class="comment"># Create new node for 't'</span><br>
+<span class="variable">node</span> = <span class="variable">node</span>.children[<span class="variable">c</span>]  <span class="comment"># Move to 't' node</span>
+            </div>
+            <div class="trie-visual">
+                <div class="node root-node">ROOT</div>
+                <div class="arrow">→</div>
+                <div class="node">b</div>
+                <div class="arrow">→</div>
+                <div class="node">y</div>
+                <div class="arrow">→</div>
+                <div class="node">t</div>
+            </div>
+            <div class="trie-visual" style="margin-top: 10px;">
+                <div style="margin-right: 140px;"></div>
+                <div class="arrow" style="transform: rotate(45deg); margin: 0 10px;">↘</div>
+                <div class="node word-end">e</div>
+            </div>
+            <div class="variable-state">
+                <strong>Now 'y' node has two children:</strong><br>
+                <strong>'y' children:</strong> {'e': TrieNode, 't': TrieNode}<br>
+                <strong>Tree is branching!</strong>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">Step 7: Insert 'e' from "byte" and mark as word</div>
+            <div class="code-step">
+<span class="variable">c</span> = <span class="string">'e'</span>  <span class="comment"># Fourth character</span><br>
+<span class="keyword">if</span> <span class="variable">c</span> <span class="keyword">not in</span> <span class="variable">node</span>.children:  <span class="comment"># 'e' not in {} → True</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="variable">node</span>.children[<span class="variable">c</span>] = TrieNode()  <span class="comment"># Create new node for 'e'</span><br>
+<span class="variable">node</span> = <span class="variable">node</span>.children[<span class="variable">c</span>]  <span class="comment"># Move to this new 'e' node</span><br>
+<br>
+<span class="comment"># All characters processed, mark as end of word</span><br>
+<span class="variable">node</span>.is_word = <span class="keyword">True</span>
+            </div>
+            <div class="trie-visual">
+                <div class="node root-node">ROOT</div>
+                <div class="arrow">→</div>
+                <div class="node">b</div>
+                <div class="arrow">→</div>
+                <div class="node">y</div>
+                <div class="arrow">→</div>
+                <div class="node">t</div>
+                <div class="arrow">→</div>
+                <div class="node word-end">e</div>
+            </div>
+            <div class="trie-visual" style="margin-top: 10px;">
+                <div style="margin-right: 140px;"></div>
+                <div class="arrow" style="transform: rotate(45deg); margin: 0 10px;">↘</div>
+                <div class="node word-end">e</div>
+            </div>
+            <div class="variable-state">
+                <strong>Two different 'e' nodes!</strong><br>
+                <strong>Path "by→e":</strong> represents "bye"<br>
+                <strong>Path "by→t→e":</strong> represents "byte"
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">Final Trie Structure</div>
+            <div class="tree-structure">
+root (is_word=False)
+└── b (is_word=False)
+    └── y (is_word=False)  
+        ├── e (is_word=True) ← "bye" ends here
+        └── t (is_word=False)
+            └── e (is_word=True) ← "byte" ends here
+            </div>
+        </div>
+
+        <h2>🔍 Search Algorithm Demonstrations</h2>
+
+        <div class="step">
+            <div class="step-header">Search("bye")</div>
+            <div class="code-step">
+<span class="variable">node</span> = <span class="keyword">self</span>.root<br>
+<span class="comment"># Check 'b': 'b' in root.children? → True, move to 'b' node</span><br>
+<span class="comment"># Check 'y': 'y' in 'b'.children? → True, move to 'y' node</span><br>
+<span class="comment"># Check 'e': 'e' in 'y'.children? → True, move to 'e' node</span><br>
+<span class="comment"># All chars processed: return node.is_word → True</span>
+            </div>
+            <div class="search-demo">
+                <strong>Result:</strong> <span class="success">TRUE</span> - "bye" is a complete word in the trie
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">Search("byte")</div>
+            <div class="code-step">
+<span class="variable">node</span> = <span class="keyword">self</span>.root<br>
+<span class="comment"># Check 'b': 'b' in root.children? → True, move to 'b' node</span><br>
+<span class="comment"># Check 'y': 'y' in 'b'.children? → True, move to 'y' node</span><br>
+<span class="comment"># Check 't': 't' in 'y'.children? → True, move to 't' node</span><br>
+<span class="comment"># Check 'e': 'e' in 't'.children? → True, move to 'e' node</span><br>
+<span class="comment"># All chars processed: return node.is_word → True</span>
+            </div>
+            <div class="search-demo">
+                <strong>Result:</strong> <span class="success">TRUE</span> - "byte" is a complete word in the trie
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">Search("by")</div>
+            <div class="code-step">
+<span class="variable">node</span> = <span class="keyword">self</span>.root<br>
+<span class="comment"># Check 'b': 'b' in root.children? → True, move to 'b' node</span><br>
+<span class="comment"># Check 'y': 'y' in 'b'.children? → True, move to 'y' node</span><br>
+<span class="comment"># All chars processed: return node.is_word → False</span>
+            </div>
+            <div class="search-demo">
+                <strong>Result:</strong> <span class="failure">FALSE</span> - "by" exists as a path but is_word=False
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">has_prefix("by")</div>
+            <div class="code-step">
+<span class="variable">node</span> = <span class="keyword">self</span>.root<br>
+<span class="comment"># Check 'b': 'b' in root.children? → True, move to 'b' node</span><br>
+<span class="comment"># Check 'y': 'y' in 'b'.children? → True, move to 'y' node</span><br>
+<span class="comment"># All chars processed: return True (path exists)</span>
+            </div>
+            <div class="search-demo">
+                <strong>Result:</strong> <span class="success">TRUE</span> - "by" exists as a valid prefix
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">Search("bytes")</div>
+            <div class="code-step">
+<span class="variable">node</span> = <span class="keyword">self</span>.root<br>
+<span class="comment"># Check 'b': 'b' in root.children? → True, move to 'b' node</span><br>
+<span class="comment"># Check 'y': 'y' in 'b'.children? → True, move to 'y' node</span><br>
+<span class="comment"># Check 't': 't' in 'y'.children? → True, move to 't' node</span><br>
+<span class="comment"># Check 'e': 'e' in 't'.children? → True, move to 'e' node</span><br>
+<span class="comment"># Check 's': 's' in 'e'.children? → False, return False</span>
+            </div>
+            <div class="search-demo">
+                <strong>Result:</strong> <span class="failure">FALSE</span> - "bytes" path doesn't exist (no 's' after "byte")
+            </div>
+        </div>
+
+        <h2>🎯 Key Insights</h2>
+        <div class="step">
+            <div class="step-header">Why Tries Are Efficient</div>
+            <ul>
+                <li><strong>Shared Prefixes:</strong> "bye" and "byte" share the path "b→y", saving space</li>
+                <li><strong>Fast Lookups:</strong> Each character lookup is O(1) with hash maps</li>
+                <li><strong>Prefix Matching:</strong> Can quickly find all words starting with "by"</li>
+                <li><strong>Clear Distinction:</strong> is_word flag separates complete words from partial paths</li>
+                <li><strong>Branching:</strong> Node 'y' branches to both 'e' and 't', supporting multiple words</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
