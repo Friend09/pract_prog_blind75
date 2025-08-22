@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find All Words on a Board - Algorithm Explanation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .section h3 {
+            color: #764ba2;
+            font-size: 1.4em;
+            margin: 25px 0 15px 0;
+        }
+
+        .collapsible {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .collapsible:hover {
+            border-color: #667eea;
+        }
+
+        .collapsible-header {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .collapsible-content {
+            padding: 20px;
+            display: none;
+        }
+
+        .collapsible.active .collapsible-content {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            line-height: 1.8;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .keyword { color: #f687b3; font-weight: bold; }
+        .string { color: #68d391; }
+        .comment { color: #a0aec0; font-style: italic; }
+        .function { color: #63b3ed; }
+        .variable { color: #fbb6ce; }
+        .number { color: #f6ad55; }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 60px);
+            gap: 5px;
+            margin: 20px auto;
+            justify-content: center;
+        }
+
+        .cell {
+            width: 60px;
+            height: 60px;
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .cell.current {
+            background: #ffd43b;
+            border-color: #fab005;
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .cell.visited {
+            background: #51cf66;
+            border-color: #37b24d;
+            color: white;
+        }
+
+        .cell.path {
+            background: #74c0fc;
+            border-color: #339af0;
+            color: white;
+        }
+
+        .step-container {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .step-header {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .algorithm-flow {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .flow-step {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .complexity-box {
+            background: linear-gradient(135deg, #fff3e0 0%, #fce4ec 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid #ff9800;
+        }
+
+        .trie-visualization {
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border: 2px solid #e9ecef;
+        }
+
+        .trie-node {
+            margin-left: 20px;
+            color: #495057;
+        }
+
+        .trie-node.word-end {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .highlight {
+            background: yellow;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .example-result {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .toggle-arrow {
+            transition: transform 0.3s ease;
+        }
+
+        .collapsible.active .toggle-arrow {
+            transform: rotate(180deg);
+        }
+
+        .board-state {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .board-state h4 {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .path-info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Find All Words on a Board</h1>
+            <p>Comprehensive Algorithm Explanation with Visual Examples</p>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2>🎯 Problem Overview</h2>
+                <p>This algorithm finds all words from a given list that can be formed by tracing paths through adjacent cells on a 2D character board. It's a classic combination of <strong>Trie (Prefix Tree)</strong> data structure and <strong>DFS with backtracking</strong>.</p>
+                
+                <div class="algorithm-flow">
+                    <h3>🔄 Algorithm Flow</h3>
+                    <div class="flow-step">
+                        <strong>1. Build Trie:</strong> Insert all words into a prefix tree for efficient prefix matching
+                    </div>
+                    <div class="flow-step">
+                        <strong>2. Initialize:</strong> Set up result list and visited tracking
+                    </div>
+                    <div class="flow-step">
+                        <strong>3. DFS Search:</strong> For each board cell, start DFS exploration using the Trie
+                    </div>
+                    <div class="flow-step">
+                        <strong>4. Backtrack:</strong> Mark cells as visited/unvisited to explore all paths
+                    </div>
+                    <div class="flow-step">
+                        <strong>5. Word Detection:</strong> When reaching a word end in Trie, add to results
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>💻 Complete Implementation</h2>
+                <div class="code-block"><span class="keyword">from</span> <span class="variable">typing</span> <span class="keyword">import</span> <span class="variable">List</span>
+
+
+<span class="keyword">class</span> <span class="function">TrieNode</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(<span class="variable">self</span>):
+        <span class="comment"># Dictionary to store child nodes</span>
+        <span class="variable">self</span>.<span class="variable">children</span> = {}
+        
+        <span class="comment"># Flag to mark end of a word</span>
+        <span class="variable">self</span>.<span class="variable">is_word</span> = <span class="keyword">False</span>
+        
+        <span class="comment"># Store the actual word (optional, for easy retrieval)</span>
+        <span class="variable">self</span>.<span class="variable">word</span> = <span class="keyword">None</span>
+
+
+<span class="keyword">class</span> <span class="function">Trie</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(<span class="variable">self</span>):
+        <span class="comment"># Initialize root node</span>
+        <span class="variable">self</span>.<span class="variable">root</span> = <span class="function">TrieNode</span>()
+    
+    <span class="keyword">def</span> <span class="function">insert</span>(<span class="variable">self</span>, <span class="variable">word</span>: <span class="variable">str</span>) -> <span class="keyword">None</span>:
+        <span class="comment"># Start from root node</span>
+        <span class="variable">node</span> = <span class="variable">self</span>.<span class="variable">root</span>
+        
+        <span class="comment"># Traverse each character in the word</span>
+        <span class="keyword">for</span> <span class="variable">char</span> <span class="keyword">in</span> <span class="variable">word</span>:
+            <span class="comment"># Create new node if character doesn't exist</span>
+            <span class="keyword">if</span> <span class="variable">char</span> <span class="keyword">not in</span> <span class="variable">node</span>.<span class="variable">children</span>:
+                <span class="variable">node</span>.<span class="variable">children</span>[<span class="variable">char</span>] = <span class="function">TrieNode</span>()
+            
+            <span class="comment"># Move to next node</span>
+            <span class="variable">node</span> = <span class="variable">node</span>.<span class="variable">children</span>[<span class="variable">char</span>]
+        
+        <span class="comment"># Mark end of word and store the word</span>
+        <span class="variable">node</span>.<span class="variable">is_word</span> = <span class="keyword">True</span>
+        <span class="variable">node</span>.<span class="variable">word</span> = <span class="variable">word</span>
+
+
+<span class="keyword">def</span> <span class="function">find_all_words_on_a_board</span>(<span class="variable">board</span>: <span class="variable">List</span>[<span class="variable">List</span>[<span class="variable">str</span>]], <span class="variable">words</span>: <span class="variable">List</span>[<span class="variable">str</span>]) -> <span class="variable">List</span>[<span class="variable">str</span>]:
+    <span class="comment"># Edge case: empty board or words</span>
+    <span class="keyword">if</span> <span class="keyword">not</span> <span class="variable">board</span> <span class="keyword">or</span> <span class="keyword">not</span> <span class="variable">board</span>[<span class="number">0</span>] <span class="keyword">or</span> <span class="keyword">not</span> <span class="variable">words</span>:
+        <span class="keyword">return</span> []
+    
+    <span class="comment"># Get board dimensions</span>
+    <span class="variable">rows</span>, <span class="variable">cols</span> = <span class="function">len</span>(<span class="variable">board</span>), <span class="function">len</span>(<span class="variable">board</span>[<span class="number">0</span>])
+    
+    <span class="comment"># Build Trie from word list</span>
+    <span class="variable">trie</span> = <span class="function">Trie</span>()
+    <span class="keyword">for</span> <span class="variable">word</span> <span class="keyword">in</span> <span class="variable">words</span>:
+        <span class="variable">trie</span>.<span class="function">insert</span>(<span class="variable">word</span>)
+    
+    <span class="comment"># Store found words (using set to avoid duplicates)</span>
+    <span class="variable">result</span> = <span class="function">set</span>()
+    
+    <span class="comment"># Directions for adjacent cells (up, down, left, right)</span>
+    <span class="variable">directions</span> = [(-<span class="number">1</span>, <span class="number">0</span>), (<span class="number">1</span>, <span class="number">0</span>), (<span class="number">0</span>, -<span class="number">1</span>), (<span class="number">0</span>, <span class="number">1</span>)]
+    
+    <span class="keyword">def</span> <span class="function">dfs</span>(<span class="variable">row</span>: <span class="variable">int</span>, <span class="variable">col</span>: <span class="variable">int</span>, <span class="variable">node</span>: <span class="variable">TrieNode</span>, <span class="variable">visited</span>: <span class="variable">set</span>) -> <span class="keyword">None</span>:
+        <span class="comment"># Check boundaries</span>
+        <span class="keyword">if</span> (<span class="variable">row</span> < <span class="number">0</span> <span class="keyword">or</span> <span class="variable">row</span> >= <span class="variable">rows</span> <span class="keyword">or</span> 
+            <span class="variable">col</span> < <span class="number">0</span> <span class="keyword">or</span> <span class="variable">col</span> >= <span class="variable">cols</span> <span class="keyword">or</span> 
+            (<span class="variable">row</span>, <span class="variable">col</span>) <span class="keyword">in</span> <span class="variable">visited</span>):
+            <span class="keyword">return</span>
+        
+        <span class="comment"># Get current character</span>
+        <span class="variable">char</span> = <span class="variable">board</span>[<span class="variable">row</span>][<span class="variable">col</span>]
+        
+        <span class="comment"># Check if character exists in Trie</span>
+        <span class="keyword">if</span> <span class="variable">char</span> <span class="keyword">not in</span> <span class="variable">node</span>.<span class="variable">children</span>:
+            <span class="keyword">return</span>
+        
+        <span class="comment"># Move to next node in Trie</span>
+        <span class="variable">node</span> = <span class="variable">node</span>.<span class="variable">children</span>[<span class="variable">char</span>]
+        
+        <span class="comment"># Check if we've found a complete word</span>
+        <span class="keyword">if</span> <span class="variable">node</span>.<span class="variable">is_word</span>:
+            <span class="variable">result</span>.<span class="function">add</span>(<span class="variable">node</span>.<span class="variable">word</span>)
+        
+        <span class="comment"># Mark current cell as visited</span>
+        <span class="variable">visited</span>.<span class="function">add</span>((<span class="variable">row</span>, <span class="variable">col</span>))
+        
+        <span class="comment"># Explore all adjacent cells</span>
+        <span class="keyword">for</span> <span class="variable">dr</span>, <span class="variable">dc</span> <span class="keyword">in</span> <span class="variable">directions</span>:
+            <span class="function">dfs</span>(<span class="variable">row</span> + <span class="variable">dr</span>, <span class="variable">col</span> + <span class="variable">dc</span>, <span class="variable">node</span>, <span class="variable">visited</span>)
+        
+        <span class="comment"># Backtrack: remove current cell from visited</span>
+        <span class="variable">visited</span>.<span class="function">remove</span>((<span class="variable">row</span>, <span class="variable">col</span>))
+    
+    <span class="comment"># Start DFS from each cell on the board</span>
+    <span class="keyword">for</span> <span class="variable">i</span> <span class="keyword">in</span> <span class="function">range</span>(<span class="variable">rows</span>):
+        <span class="keyword">for</span> <span class="variable">j</span> <span class="keyword">in</span> <span class="function">range</span>(<span class="variable">cols</span>):
+            <span class="function">dfs</span>(<span class="variable">i</span>, <span class="variable">j</span>, <span class="variable">trie</span>.<span class="variable">root</span>, <span class="function">set</span>())
+    
+    <span class="comment"># Convert set to list and return</span>
+    <span class="keyword">return</span> <span class="function">list</span>(<span class="variable">result</span>)</div>
+            </div>
+
+            <div class="collapsible">
+                <div class="collapsible-header">
+                    📊 Trie Data Structure Visualization
+                    <span class="toggle-arrow">▼</span>
+                </div>
+                <div class="collapsible-content">
+                    <p>The Trie stores all words efficiently, allowing us to quickly check if a path prefix matches any word prefix:</p>
+                    
+                    <div class="trie-visualization">
+Words: ['byte', 'bytes', 'rain', 'train']
+
+Root
+├── b
+│   └── y
+│       └── t
+│           └── e ✓ (word: "byte")
+│               └── s ✓ (word: "bytes")
+├── r
+│   └── a
+│       └── i
+│           └── n ✓ (word: "rain")
+└── t
+    └── r
+        └── a
+            └── i
+                └── n ✓ (word: "train")
+                    </div>
+                    
+                    <p><strong>Key Benefits:</strong></p>
+                    <ul>
+                        <li>✅ Efficient prefix checking - O(1) per character</li>
+                        <li>✅ Early termination when no words start with current path</li>
+                        <li>✅ Space efficient for overlapping prefixes</li>
+                        <li>✅ Fast word detection at any path length</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <div class="collapsible-header">
+                    🔍 Example 1: Finding "byte" - Step by Step
+                    <span class="toggle-arrow">▼</span>
+                </div>
+                <div class="collapsible-content">
+                    <p>Let's trace through finding the word "byte" starting from position (0,0):</p>
+                    
+                    <div class="board-state">
+                        <h4>Initial Board State</h4>
+                        <div class="board">
+                            <div class="cell">b</div>
+                            <div class="cell">y</div>
+                            <div class="cell">s</div>
+                            <div class="cell">r</div>
+                            <div class="cell">t</div>
+                            <div class="cell">e</div>
+                            <div class="cell">a</div>
+                            <div class="cell">i</div>
+                            <div class="cell">n</div>
+                        </div>
+                    </div>
+
+                    <div class="step-container">
+                        <div class="step-header">Step 1: Start at (0,0) - Character 'b'</div>
+                        <div class="board-state">
+                            <div class="board">
+                                <div class="cell current">b</div>
+                                <div class="cell">y</div>
+                                <div class="cell">s</div>
+                                <div class="cell">r</div>
+                                <div class="cell">t</div>
+                                <div class="cell">e</div>
+                                <div class="cell">a</div>
+                                <div class="cell">i</div>
+                                <div class="cell">n</div>
+                            </div>
+                        </div>
+                        <div class="path-info">
+                            <strong>Current Path:</strong> "b"<br>
+                            <strong>Trie Status:</strong> 'b' exists in Trie root.children ✓<br>
+                            <strong>Visited:</strong> {(0,0)}<br>
+                            <strong>Next:</strong> Check adjacent cells (0,1) and (1,0)
+                        </div>
+                    </div>
+
+                    <div class="step-container">
+                        <div class="step-header">Step 2: Move to (0,1) - Character 'y'</div>
+                        <div class="board-state">
+                            <div class="board">
+                                <div class="cell visited">b</div>
+                                <div class="cell current">y</div>
+                                <div class="cell">s</div>
+                                <div class="cell">r</div>
+                                <div class="cell">t</div>
+                                <div class="cell">e</div>
+                                <div class="cell">a</div>
+                                <div class="cell">i</div>
+                                <div class="cell">n</div>
+                            </div>
+                        </div>
+                        <div class="path-info">
+                            <strong>Current Path:</strong> "by"<br>
+                            <strong>Trie Status:</strong> 'y' exists in node.children['b'].children ✓<br>
+                            <strong>Visited:</strong> {(0,0), (0,1)}<br>
+                            <strong>Next:</strong> Check adjacent cells (1,1) and (0,2)
+                        </div>
+                    </div>
+
+                    <div class="step-container">
+                        <div class="step-header">Step 3: Move to (1,1) - Character 't'</div>
+                        <div class="board-state">
+                            <div class="board">
+                                <div class="cell visited">b</div>
+                                <div class="cell visited">y</div>
+                                <div class="cell">s</div>
+                                <div class="cell">r</div>
+                                <div class="cell current">t</div>
+                                <div class="cell">e</div>
+                                <div class="cell">a</div>
+                                <div class="cell">i</div>
+                                <div class="cell">n</div>
+                            </div>
+                        </div>
+                        <div class="path-info">
+                            <strong>Current Path:</strong> "byt"<br>
+                            <strong>Trie Status:</strong> 't' exists in node.children['b'].children['y'].children ✓<br>
+                            <strong>Visited:</strong> {(0,0), (0,1), (1,1)}<br>
+                            <strong>Next:</strong> Check adjacent cells (1,2)
+                        </div>
+                    </div>
+
+                    <div class="step-container">
+                        <div class="step-header">Step 4: Move to (1,2) - Character 'e'</div>
+                        <div class="board-state">
+                            <div class="board">
+                                <div class="cell visited">b</div>
+                                <div class="cell visited">y</div>
+                                <div class="cell">s</div>
+                                <div class="cell">r</div>
+                                <div class="cell visited">t</div>
+                                <div class="cell current">e</div>
+                                <div class="cell">a</div>
+                                <div class="cell">i</div>
+                                <div class="cell">n</div>
+                            </div>
+                        </div>
+                        <div class="path-info">
+                            <strong>Current Path:</strong> "byte"<br>
+                            <strong>Trie Status:</strong> 'e' exists and is_word = True ✓<br>
+                            <strong>Action:</strong> Add "byte" to result set!<br>
+                            <strong>Continue:</strong> Check for longer words like "bytes"
+                        </div>
+                    </div>
+
+                    <div class="example-result">
+                        <strong>✅ Word Found:</strong> "byte" successfully traced through path: (0,0)→(0,1)→(1,1)→(1,2)
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <div class="collapsible-header">
+                    🌧️ Example 2: Finding "rain" - Step by Step
+                    <span class="toggle-arrow">▼</span>
+                </div>
+                <div class="collapsible-content">
+                    <p>Let's trace through finding the word "rain" starting from position (1,0):</p>
+
+                    <div class="step-container">
+                        <div class="step-header">Step 1: Start at (1,0) - Character 'r'</div>
+                        <div class="board-state">
+                            <div class="board">
+                                <div class="cell">b</div>
+                                <div class="cell">y</div>
+                                <div class="cell">s</div>
+                                <div class="cell current">r</div>
+                                <div class="cell">t</div>
+                                <div class="cell">e</div>
+                                <div class="cell">a</div>
+                                <div class="cell">i</div>
+                                <div class="cell">n</div>
+                            </div>
+                        </div>
+                        <div class="path-info">
+                            <strong>Current Path:</strong> "r"<br>
+                            <strong>Trie Status:</strong> 'r' exists in Trie root.children ✓<br>
+                            <strong>Visited:</strong> {(1,0)}<br>
+                            <strong>Next:</strong> Check adjacent cells
+                        </div>
+                    </div>
+
+                    <div class="step-container">
+                        <div class="step-header">Step 2: Move to (2,0) - Character 'a'</div>
+                        <div class="board-state">
+                            <div class="board">
+                                <div class="cell">b</div>
+                                <div class="cell">y</div>
+                                <div class="cell">s</div>
+                                <div class="cell visited">r</div>
+                                <div class="cell">t</div>
+                                <div class="cell">e</div>
+                                <div class="cell current">a</div>
+                                <div class="cell">i</div>
+                                <div class="cell">n</div>
+                            </div>
+                        </div>
+                        <div class="path-info">
+                            <strong>Current Path:</strong> "ra"<br>
+                            <strong>Trie Status:</strong> 'a' exists in node.children['r'].children ✓<br>
+                            <strong>Visited:</strong> {(1,0), (2,0)}<br>
+                            <strong>Next:</strong> Check adjacent cells
+                        </div>
+                    </div>
+
+                    <div class="step-container">
+                        <div class="step-header">Step 3: Move to (2,1) - Character 'i'</div>
+                        <div class="board-state">
+                            <div class="board">
+                                <div class="cell">b</div>
+                                <div class="cell">y</div>
+                                <div class="cell">s</div>
+                                <div class="cell visited">r</div>
+                                <div class="cell">t</div>
+                                <div class="cell">e</div>
+                                <div class="cell visited">a</div>
+                                <div class="cell current">i</div>
+                                <div class="cell">n</div>
+                            </div>
+                        </div>
+                        <div class="path-info">
+                            <strong>Current Path:</strong> "rai"<br>
+                            <strong>Trie Status:</strong> 'i' exists in node.children['r'].children['a'].children ✓<br>
+                            <strong>Visited:</strong> {(1,0), (2,0), (2,1)}<br>
+                            <strong>Next:</strong> Check adjacent cells
+                        </div>
+                    </div>
+
+                    <div class="step-container">
+                        <div class="step-header">Step 4: Move to (2,2) - Character 'n'</div>
+                        <div class="board-state">
+                            <div class="board">
+                                <div class="cell">b</div>
+                                <div class="cell">y</div>
+                                <div class="cell">s</div>
+                                <div class="cell visited">r</div>
+                                <div class="cell">t</div>
+                                <div class="cell">e</div>
+                                <div class="cell visited">a</div>
+                                <div class="cell visited">i</div>
+                                <div class="cell current">n</div>
+                            </div>
+                        </div>
+                        <div class="path-info">
+                            <strong>Current Path:</strong> "rain"<br>
+                            <strong>Trie Status:</strong> 'n' exists and is_word = True ✓<br>
+                            <strong>Action:</strong> Add "rain" to result set!
+                        </div>
+                    </div>
+
+                    <div class="example-result">
+                        <strong>✅ Word Found:</strong> "rain" successfully traced through path: (1,0)→(2,0)→(2,1)→(2,2)
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <div class="collapsible-header">
+                    ❌ Example 3: Why "rat" Cannot Be Found
+                    <span class="toggle-arrow">▼</span>
+                </div>
+                <div class="collapsible-content">
+                    <p>Let's see why "rat" cannot be formed on this board:</p>
+
+                    <div class="step-container">
+                        <div class="step-header">Attempt 1: Start at (1,0) - Character 'r'</div>
+                        <div class="board-state">
+                            <div class="board">
+                                <div class="cell">b</div>
+                                <div class="cell">y</div>
+                                <div class="cell">s</div>
+                                <div class="cell current">r</div>
+                                <div class="cell">t</div>
+                                <div class="cell">e</div>
+                                <div class="cell">a</div>
+                                <div class="cell">i</div>
+                                <div class="cell">n</div>
+                            </div>
+                        </div>
+                        <div class="path-info">
+                            <strong>Current Path:</strong> "r"<br>
+                            <strong>Need Next:</strong> 'a' (for "rat")<br>
+                            <strong>Adjacent Cells:</strong> (0,0)='b', (1,1)='t', (2,0)='a' ✓<br>
+                            <strong>Problem:</strong> After 'r'→'a', need 't' but 't' is not adjacent to 'a'
+                        </div>
+                    </div>
+
+                    <div class="step-container">
+                        <div class="step-header">Path Analysis: r→a→?</div>
+                        <div class="board-state">
+                            <div class="board">
+                                <div class="cell">b</div>
+                                <div class="cell">y</div>
+                                <div class="cell">s</div>
+                                <div class="cell visited">r</div>
+                                <div class="cell">t</div>
+                                <div class="cell">e</div>
+                                <div class="cell current">a</div>
+                                <div class="cell">i</div>
+                                <div class="cell">n</div>
+                            </div>
+                        </div>
+                        <div class="path-info">
+                            <strong>Current Path:</strong> "ra"<br>
+                            <strong>Need Next:</strong> 't' (to complete "rat")<br>
+                            <strong>Adjacent to 'a' at (2,0):</strong> (1,0)='r' (visited), (2,1)='i'<br>
+                            <strong>Result:</strong> No 't' is adjacent to 'a', so "rat" cannot be formed
+                        </div>
+                    </div>
+
+                    <div class="example-result">
+                        <strong>❌ Word Not Found:</strong> "rat" cannot be formed because 't' is not adjacent to 'a' in any valid path
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <div class="collapsible-header">
+                    🔄 Backtracking Mechanism
+                    <span class="toggle-arrow">▼</span>
+                </div>
+                <div class="collapsible-content">
+                    <p>Backtracking is crucial for exploring all possible paths. Here's how it works:</p>
+
+                    <div class="code-block"><span class="comment"># In the DFS function:</span>
+
+<span class="comment"># 1. Mark current cell as visited</span>
+<span class="variable">visited</span>.<span class="function">add</span>((<span class="variable">row</span>, <span class="variable">col</span>))
+
+<span class="comment"># 2. Explore all adjacent cells</span>
+<span class="keyword">for</span> <span class="variable">dr</span>, <span class="variable">dc</span> <span class="keyword">in</span> <span class="variable">directions</span>:
+    <span class="function">dfs</span>(<span class="variable">row</span> + <span class="variable">dr</span>, <span class="variable">col</span> + <span class="variable">dc</span>, <span class="variable">node</span>, <span class="variable">visited</span>)
+
+<span class="comment"># 3. CRITICAL: Backtrack by removing from visited</span>
+<span class="variable">visited</span>.<span class="function">remove</span>((<span class="variable">row</span>, <span class="variable">col</span>))  <span class="comment"># This allows other paths to use this cell</span></div>
+
+                    <div class="step-container">
+                        <div class="step-header">Why Backtracking is Essential</div>
+                        <p><strong>Without backtracking:</strong> Once a cell is marked as visited for one path, it remains unavailable for other paths starting from different positions.</p>
+                        
+                        <p><strong>With backtracking:</strong> After exploring all paths from a cell, we "unvisit" it, allowing other starting positions to use that cell in their paths.</p>
+                        
+                        <div class="path-info">
+                            <strong>Example:</strong> Cell (1,1) = 't' can be used in:
+                            <ul>
+                                <li>Path for "byte": b→y→t→e</li>
+                                <li>Path for "bytes": b→y→t→e→s</li>
+                                <li>Any other valid path that includes 't'</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapsible">
+                <div class="collapsible-header">
+                    🧪 Complete Test Run
+                    <span class="toggle-arrow">▼</span>
+                </div>
+                <div class="collapsible-content">
+                    <div class="code-block"><span class="comment"># Test the algorithm with our example</span>
+<span class="variable">board</span> = [
+    [<span class="string">'b'</span>, <span class="string">'y'</span>, <span class="string">'s'</span>],
+    [<span class="string">'r'</span>, <span class="string">'t'</span>, <span class="string">'e'</span>],
+    [<span class="string">'a'</span>, <span class="string">'i'</span>, <span class="string">'n'</span>]
+]
+
+<span class="variable">words</span> = [<span class="string">'byte'</span>, <span class="string">'bytes'</span>, <span class="string">'rat'</span>, <span class="string">'rain'</span>, <span class="string">'trait'</span>, <span class="string">'train'</span>]
+
+<span class="variable">result</span> = <span class="function">find_all_words_on_a_board</span>(<span class="variable">board</span>, <span class="variable">words</span>)
+<span class="function">print</span>(<span class="variable">result</span>)  <span class="comment"># Output: ['byte', 'bytes', 'rain', 'train']</span></div>
+
+                    <div class="step-container">
+                        <div class="step-header">Results Breakdown</div>
+                        <div class="example-result">
+                            <strong>✅ Found Words:</strong>
+                            <ul>
+                                <li><strong>byte:</strong> (0,0)→(0,1)→(1,1)→(1,2)</li>
+                                <li><strong>bytes:</strong> (0,0)→(0,1)→(1,1)→(1,2)→(0,2)</li>
+                                <li><strong>rain:</strong> (1,0)→(2,0)→(2,1)→(2,2)</li>
+                                <li><strong>train:</strong> (1,1)→(1,0)→(2,0)→(2,1)→(2,2)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="path-info">
+                            <strong>❌ Not Found:</strong>
+                            <ul>
+                                <li><strong>rat:</strong> No valid adjacent path r→a→t</li>
+                                <li><strong>trait:</strong> No valid adjacent path (would need t→r→a→i→t)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>⚡ Algorithm Complexity & Performance</h2>
+                
+                <div class="complexity-box">
+                    <h3>Time Complexity: O(M × N × 4^L)</h3>
+                    <ul>
+                        <li><strong>M × N:</strong> We start DFS from each cell on the board</li>
+                        <li><strong>4^L:</strong> For each starting cell, worst case explores 4 directions at each step for L steps (max word length)</li>
+                        <li><strong>Trie Operations:</strong> O(1) for each character lookup</li>
+                    </ul>
+                    
+                    <h3>Space Complexity: O(K × L)</h3>
+                    <ul>
+                        <li><strong>K:</strong> Number of words in the word list</li>
+                        <li><strong>L:</strong> Average length of words (for Trie storage)</li>
+                        <li><strong>Additional:</strong> O(L) for recursion stack and visited set</li>
+                    </ul>
+                </div>
+
+                <div class="algorithm-flow">
+                    <h3>🎯 Key Optimizations</h3>
+                    <div class="flow-step">
+                        <strong>Trie Pruning:</strong> Early termination when current path doesn't match any word prefix
+                    </div>
+                    <div class="flow-step">
+                        <strong>Visited Tracking:</strong> Prevents cycles and ensures each cell is used once per word
+                    </div>
+                    <div class="flow-step">
+                        <strong>Backtracking:</strong> Allows cells to be reused across different word searches
+                    </div>
+                    <div class="flow-step">
+                        <strong>Set for Results:</strong> Automatically handles duplicate words
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🚀 Real-World Applications</h2>
+                <div class="algorithm-flow">
+                    <div class="flow-step">
+                        <strong>🎮 Word Games:</strong> Boggle, Word Search puzzles, Scrabble variant games
+                    </div>
+                    <div class="flow-step">
+                        <strong>🧠 Educational Tools:</strong> Vocabulary building, pattern recognition training
+                    </div>
+                    <div class="flow-step">
+                        <strong>🔍 Text Processing:</strong> Document analysis, keyword extraction from structured data
+                    </div>
+                    <div class="flow-step">
+                        <strong>🧬 Bioinformatics:</strong> DNA sequence analysis, protein structure studies
+                    </div>
+                    <div class="flow-step">
+                        <strong>🗺️ Path Finding:</strong> Route optimization with specific sequence requirements
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const collapsibles = document.querySelectorAll('.collapsible');
+            
+            collapsibles.forEach(collapsible => {
+                const header = collapsible.querySelector('.collapsible-header');
+                header.addEventListener('click', function() {
+                    collapsible.classList.toggle('active');
+                });
+            });
+
+            // Auto-open first example for better UX
+            if (collapsibles.length > 1) {
+                collapsibles[1].classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>
