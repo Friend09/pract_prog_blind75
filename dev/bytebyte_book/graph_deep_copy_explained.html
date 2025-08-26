@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph Deep Copy Algorithm - Step by Step</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #569cd6;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            color: #4ec9b0;
+            margin: 30px 0 15px 0;
+            border-bottom: 2px solid #4ec9b0;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #dcdcaa;
+            margin: 20px 0 10px 0;
+        }
+
+        .section {
+            background: #252526;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 4px solid #007acc;
+        }
+
+        .collapsible {
+            cursor: pointer;
+            padding: 15px;
+            background: #2d2d30;
+            border: none;
+            color: #d4d4d4;
+            text-align: left;
+            outline: none;
+            font-size: 16px;
+            border-radius: 5px;
+            margin: 10px 0;
+            width: 100%;
+            font-weight: bold;
+        }
+
+        .collapsible:hover {
+            background: #3c3c3c;
+        }
+
+        .collapsible.active {
+            background: #007acc;
+        }
+
+        .content {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background: #2d2d30;
+            border-radius: 0 0 5px 5px;
+        }
+
+        .content.show {
+            max-height: 2000px;
+            padding: 20px;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #569cd6;
+            white-space: pre-wrap;
+            line-height: 1.8;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+
+        .keyword { color: #569cd6; font-weight: bold; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; font-style: italic; }
+        .function { color: #dcdcaa; }
+        .variable { color: #9cdcfe; }
+        .number { color: #b5cea8; }
+
+        .step {
+            background: #2d2d30;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #4ec9b0;
+        }
+
+        .step-title {
+            color: #4ec9b0;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .visual-graph {
+            background: #2d2d30;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+            border: 2px solid #4ec9b0;
+        }
+
+        .graph-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 40px;
+        }
+
+        .graph-side {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .graph-svg {
+            background: #1e1e1e;
+            border-radius: 8px;
+            border: 2px solid #3c3c3c;
+        }
+
+        .node {
+            fill: #007acc;
+            stroke: #ffffff;
+            stroke-width: 2;
+        }
+
+        .cloned-node {
+            fill: #ff6b35;
+            stroke: #ff8c69;
+            stroke-width: 3;
+            stroke-dasharray: 5,5;
+        }
+
+        .node-text {
+            fill: white;
+            font-weight: bold;
+            font-size: 16px;
+            text-anchor: middle;
+            dominant-baseline: central;
+        }
+
+        .edge {
+            stroke: #4ec9b0;
+            stroke-width: 3;
+            opacity: 0.8;
+        }
+
+        .arrow {
+            font-size: 40px;
+            color: #4ec9b0;
+            margin: 0 20px;
+        }
+
+        .state-display {
+            background: #3c3c3c;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+
+        .highlight {
+            background: #ff6b3520;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .complexity-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            color: white;
+        }
+
+        .test-case {
+            background: #1e1e1e;
+            border: 2px solid #4ec9b0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .flow-diagram {
+            background: #2d2d30;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .flow-box {
+            display: inline-block;
+            background: #007acc;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 10px;
+            min-width: 150px;
+        }
+
+        .flow-arrow {
+            font-size: 24px;
+            color: #4ec9b0;
+            margin: 0 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            border: 1px solid #3c3c3c;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #007acc;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #2d2d30;
+        }
+
+        .warning {
+            background: #ff6b3520;
+            border-left: 4px solid #ff6b35;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Graph Deep Copy Algorithm</h1>
+        
+        <div class="section">
+            <h2>📋 Problem Overview</h2>
+            <p><strong>Goal:</strong> Create a deep copy of an undirected graph starting from any given node</p>
+            <p><strong>Key Challenge:</strong> Handle cycles without infinite recursion and ensure complete independence</p>
+            
+            <div class="visual-graph">
+                <h3>Original vs Cloned Graph</h3>
+                <div class="graph-container">
+                    <div class="graph-side">
+                        <h4 style="color: #007acc; margin-bottom: 15px;">Original Graph</h4>
+                        <svg class="graph-svg" width="200" height="200" viewBox="0 0 200 200">
+                            <!-- Edges -->
+                            <line class="edge" x1="60" y1="60" x2="140" y2="60"/>
+                            <line class="edge" x1="60" y1="60" x2="60" y2="140"/>
+                            <line class="edge" x1="140" y1="60" x2="140" y2="140"/>
+                            <line class="edge" x1="60" y1="140" x2="140" y2="140"/>
+                            
+                            <!-- Nodes -->
+                            <circle class="node" cx="60" cy="60" r="25"/>
+                            <text class="node-text" x="60" y="60">0</text>
+                            
+                            <circle class="node" cx="140" cy="60" r="25"/>
+                            <text class="node-text" x="140" y="60">1</text>
+                            
+                            <circle class="node" cx="60" cy="140" r="25"/>
+                            <text class="node-text" x="60" y="140">2</text>
+                            
+                            <circle class="node" cx="140" cy="140" r="25"/>
+                            <text class="node-text" x="140" y="140">3</text>
+                        </svg>
+                        <p style="color: #007acc; font-size: 12px; margin-top: 10px;">
+                            Connections: 0↔[1,2], 1↔[0,3], 2↔[0,3], 3↔[1,2]
+                        </p>
+                    </div>
+                    
+                    <div class="arrow">⟹</div>
+                    
+                    <div class="graph-side">
+                        <h4 style="color: #ff6b35; margin-bottom: 15px;">Cloned Graph</h4>
+                        <svg class="graph-svg" width="200" height="200" viewBox="0 0 200 200">
+                            <!-- Edges -->
+                            <line class="edge" x1="60" y1="60" x2="140" y2="60"/>
+                            <line class="edge" x1="60" y1="60" x2="60" y2="140"/>
+                            <line class="edge" x1="140" y1="60" x2="140" y2="140"/>
+                            <line class="edge" x1="60" y1="140" x2="140" y2="140"/>
+                            
+                            <!-- Cloned Nodes -->
+                            <circle class="cloned-node" cx="60" cy="60" r="25"/>
+                            <text class="node-text" x="60" y="60">0</text>
+                            
+                            <circle class="cloned-node" cx="140" cy="60" r="25"/>
+                            <text class="node-text" x="140" y="60">1</text>
+                            
+                            <circle class="cloned-node" cx="60" cy="140" r="25"/>
+                            <text class="node-text" x="60" y="140">2</text>
+                            
+                            <circle class="cloned-node" cx="140" cy="140" r="25"/>
+                            <text class="node-text" x="140" y="140">3</text>
+                        </svg>
+                        <p style="color: #ff6b35; font-size: 12px; margin-top: 10px;">
+                            Same structure, completely independent objects
+                        </p>
+                    </div>
+                </div>
+                <p style="margin-top: 15px; color: #4ec9b0; font-weight: bold;">All nodes are deep copies with no references to original graph</p>
+            </div>
+        </div>
+
+        <button class="collapsible">🔍 Algorithm Flow & Structure</button>
+        <div class="content">
+            <div class="flow-diagram">
+                <div class="flow-box">Start with given node</div>
+                <div class="flow-arrow">↓</div><br>
+                <div class="flow-box">Check if already cloned</div>
+                <div class="flow-arrow">↓</div><br>
+                <div class="flow-box">Create new clone</div>
+                <div class="flow-arrow">↓</div><br>
+                <div class="flow-box">Store in clone_map</div>
+                <div class="flow-arrow">↓</div><br>
+                <div class="flow-box">Recursively clone neighbors</div>
+                <div class="flow-arrow">↓</div><br>
+                <div class="flow-box">Return cloned node</div>
+            </div>
+        </div>
+
+        <button class="collapsible">▶️ Practical Execution - How to Actually Run This</button>
+        <div class="content">
+            <div class="section">
+                <h3>🏗️ Step 1: Build the Input Graph</h3>
+                <div class="code-block"><span class="comment"># First, create individual nodes</span>
+<span class="variable">node0</span> = <span class="function">GraphNode</span>(<span class="number">0</span>)
+<span class="variable">node1</span> = <span class="function">GraphNode</span>(<span class="number">1</span>)  
+<span class="variable">node2</span> = <span class="function">GraphNode</span>(<span class="number">2</span>)
+<span class="variable">node3</span> = <span class="function">GraphNode</span>(<span class="number">3</span>)
+
+<span class="comment"># Connect the nodes to form the square graph</span>
+<span class="variable">node0</span>.<span class="variable">neighbors</span> = [<span class="variable">node1</span>, <span class="variable">node2</span>]  <span class="comment"># 0 connects to 1 and 2</span>
+<span class="variable">node1</span>.<span class="variable">neighbors</span> = [<span class="variable">node0</span>, <span class="variable">node3</span>]  <span class="comment"># 1 connects to 0 and 3</span>
+<span class="variable">node2</span>.<span class="variable">neighbors</span> = [<span class="variable">node0</span>, <span class="variable">node3</span>]  <span class="comment"># 2 connects to 0 and 3</span>
+<span class="variable">node3</span>.<span class="variable">neighbors</span> = [<span class="variable">node1</span>, <span class="variable">node2</span>]  <span class="comment"># 3 connects to 1 and 2</span>
+
+<span class="comment"># Now we have our input graph ready!</span>
+<span class="variable">input_graph</span> = <span class="variable">node0</span>  <span class="comment"># Starting point (any node works)</span></div>
+            </div>
+
+            <div class="section">
+                <h3>🚀 Step 2: Call the Function</h3>
+                <div class="code-block"><span class="comment"># This is the main function call</span>
+<span class="variable">cloned_graph</span> = <span class="function">graph_deep_copy</span>(<span class="variable">input_graph</span>)
+
+<span class="comment"># OR you could start from any other node:</span>
+<span class="comment"># cloned_graph = graph_deep_copy(node1)  # Same result!</span>
+<span class="comment"># cloned_graph = graph_deep_copy(node2)  # Same result!</span>
+<span class="comment"># cloned_graph = graph_deep_copy(node3)  # Same result!</span></div>
+            </div>
+
+            <div class="section">
+                <h3>🔍 Step 3: Inspect the Results</h3>
+                <div class="code-block"><span class="comment"># What did we get back?</span>
+<span class="function">print</span>(<span class="string">f"Input graph starting node value: {input_graph.val}"</span>)
+<span class="function">print</span>(<span class="string">f"Cloned graph starting node value: {cloned_graph.val}"</span>)
+
+<span class="comment"># Check if they're different objects</span>
+<span class="function">print</span>(<span class="string">f"Are they the same object? {input_graph is cloned_graph}"</span>)
+<span class="function">print</span>(<span class="string">f"Original node ID: {id(input_graph)}"</span>)
+<span class="function">print</span>(<span class="string">f"Cloned node ID: {id(cloned_graph)}"</span>)
+
+<span class="comment"># Check the neighbors</span>
+<span class="function">print</span>(<span class="string">f"Original has {len(input_graph.neighbors)} neighbors"</span>)
+<span class="function">print</span>(<span class="string">f"Clone has {len(cloned_graph.neighbors)} neighbors"</span>)</div>
+                <div class="state-display">Expected Output:
+Input graph starting node value: 0
+Cloned graph starting node value: 0
+Are they the same object? False
+Original node ID: 140234567890123
+Cloned node ID: 140234567891456
+Original has 2 neighbors
+Clone has 2 neighbors</div>
+            </div>
+
+            <div class="section">
+                <h3>✅ Step 4: Verify Deep Copy Worked</h3>
+                <div class="code-block"><span class="keyword">def</span> <span class="function">print_graph_structure</span>(<span class="variable">start_node</span>, <span class="variable">title</span>):
+    <span class="function">print</span>(<span class="string">f"\n=== {title} ==="</span>)
+    <span class="variable">visited</span> = <span class="function">set</span>()
+    
+    <span class="keyword">def</span> <span class="function">dfs_print</span>(<span class="variable">node</span>):
+        <span class="keyword">if</span> <span class="variable">node</span> <span class="keyword">in</span> <span class="variable">visited</span>:
+            <span class="keyword">return</span>
+        <span class="variable">visited</span>.<span class="function">add</span>(<span class="variable">node</span>)
+        
+        <span class="variable">neighbor_vals</span> = [<span class="variable">n</span>.<span class="variable">val</span> <span class="keyword">for</span> <span class="variable">n</span> <span class="keyword">in</span> <span class="variable">node</span>.<span class="variable">neighbors</span>]
+        <span class="function">print</span>(<span class="string">f"Node {node.val} (ID:{id(node)}) → {neighbor_vals}"</span>)
+        
+        <span class="keyword">for</span> <span class="variable">neighbor</span> <span class="keyword">in</span> <span class="variable">node</span>.<span class="variable">neighbors</span>:
+            <span class="function">dfs_print</span>(<span class="variable">neighbor</span>)
+    
+    <span class="function">dfs_print</span>(<span class="variable">start_node</span>)
+
+<span class="comment"># Now let's see both graphs</span>
+<span class="function">print_graph_structure</span>(<span class="variable">input_graph</span>, <span class="string">"ORIGINAL GRAPH"</span>)
+<span class="function">print_graph_structure</span>(<span class="variable">cloned_graph</span>, <span class="string">"CLONED GRAPH"</span>)</div>
+                <div class="state-display">Expected Output:
+=== ORIGINAL GRAPH ===
+Node 0 (ID:140234567890123) → [1, 2]
+Node 1 (ID:140234567890456) → [0, 3]
+Node 3 (ID:140234567890789) → [1, 2]
+Node 2 (ID:140234567890012) → [0, 3]
+
+=== CLONED GRAPH ===
+Node 0 (ID:140234567891123) → [1, 2]
+Node 1 (ID:140234567891456) → [0, 3]
+Node 3 (ID:140234567891789) → [1, 2]
+Node 2 (ID:140234567891012) → [0, 3]</div>
+                <p>🎯 <strong>Key Observation:</strong> Same structure, completely different object IDs!</p>
+            </div>
+
+            <div class="section">
+                <h3>🧪 Complete Working Example</h3>
+                <div class="code-block"><span class="keyword">class</span> <span class="function">GraphNode</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(<span class="variable">self</span>, <span class="variable">val</span>):
+        <span class="variable">self</span>.<span class="variable">val</span> = <span class="variable">val</span>
+        <span class="variable">self</span>.<span class="variable">neighbors</span> = []
+
+
+<span class="keyword">def</span> <span class="function">graph_deep_copy</span>(<span class="variable">node</span>):
+    <span class="keyword">if</span> <span class="keyword">not</span> <span class="variable">node</span>:
+        <span class="keyword">return</span> <span class="keyword">None</span>
+    <span class="keyword">return</span> <span class="function">dfs</span>(<span class="variable">node</span>, {})
+
+
+<span class="keyword">def</span> <span class="function">dfs</span>(<span class="variable">node</span>, <span class="variable">clone_map</span>):
+    <span class="keyword">if</span> <span class="variable">node</span> <span class="keyword">in</span> <span class="variable">clone_map</span>:
+        <span class="keyword">return</span> <span class="variable">clone_map</span>[<span class="variable">node</span>]
+    
+    <span class="variable">cloned_node</span> = <span class="function">GraphNode</span>(<span class="variable">node</span>.<span class="variable">val</span>)
+    <span class="variable">clone_map</span>[<span class="variable">node</span>] = <span class="variable">cloned_node</span>
+    
+    <span class="keyword">for</span> <span class="variable">neighbor</span> <span class="keyword">in</span> <span class="variable">node</span>.<span class="variable">neighbors</span>:
+        <span class="variable">cloned_neighbor</span> = <span class="function">dfs</span>(<span class="variable">neighbor</span>, <span class="variable">clone_map</span>)
+        <span class="variable">cloned_node</span>.<span class="variable">neighbors</span>.<span class="function">append</span>(<span class="variable">cloned_neighbor</span>)
+    
+    <span class="keyword">return</span> <span class="variable">cloned_node</span>
+
+
+<span class="comment"># MAIN EXECUTION STARTS HERE</span>
+<span class="keyword">if</span> <span class="variable">__name__</span> == <span class="string">"__main__"</span>:
+    <span class="comment"># Create the triangle graph: 0-1-2-0</span>
+    <span class="variable">a</span> = <span class="function">GraphNode</span>(<span class="number">0</span>)
+    <span class="variable">b</span> = <span class="function">GraphNode</span>(<span class="number">1</span>) 
+    <span class="variable">c</span> = <span class="function">GraphNode</span>(<span class="number">2</span>)
+    
+    <span class="comment"># Make connections</span>
+    <span class="variable">a</span>.<span class="variable">neighbors</span> = [<span class="variable">b</span>, <span class="variable">c</span>]
+    <span class="variable">b</span>.<span class="variable">neighbors</span> = [<span class="variable">a</span>, <span class="variable">c</span>]
+    <span class="variable">c</span>.<span class="variable">neighbors</span> = [<span class="variable">a</span>, <span class="variable">b</span>]
+    
+    <span class="comment"># This is the actual function call!</span>
+    <span class="variable">input_graph</span> = <span class="variable">a</span>  
+    <span class="variable">result</span> = <span class="function">graph_deep_copy</span>(<span class="variable">input_graph</span>)
+    
+    <span class="function">print</span>(<span class="string">"✅ Graph cloning completed!"</span>)
+    <span class="function">print</span>(<span class="string">f"Input: Node {input_graph.val} at {hex(id(input_graph))}"</span>)
+    <span class="function">print</span>(<span class="string">f"Output: Node {result.val} at {hex(id(result))}"</span>)
+    <span class="function">print</span>(<span class="string">f"Deep copy success: {input_graph is not result}"</span>)</div>
+            </div>
+
+            <div class="section">
+                <h3>💻 Running in Terminal</h3>
+                <div class="code-block" style="background: #000000; color: #00ff00;"><span style="color: #ffff00;">$ python3 graph_clone.py</span>
+
+✅ Graph cloning completed!
+Input: Node 0 at 0x7f8b8c0d5f40
+Output: Node 0 at 0x7f8b8c0d6120  
+Deep copy success: True
+
+<span style="color: #ffff00;">$ </span></div>
+            </div>
+
+            <div class="test-case">
+                <h3>🎯 What Happens During Execution</h3>
+                <div class="step">
+                    <div class="step-title">1. graph_deep_copy(a) called</div>
+                    <p>Where 'a' is the GraphNode(0) we created</p>
+                </div>
+                <div class="step">
+                    <div class="step-title">2. dfs(node=a, clone_map={}) called</div>
+                    <p>Starts the recursive process with empty hashmap</p>
+                </div>
+                <div class="step">
+                    <div class="step-title">3. Creates cloned_a = GraphNode(0)</div>
+                    <p>First clone made, stored in clone_map</p>
+                </div>
+                <div class="step">
+                    <div class="step-title">4. Recursively processes neighbors [b, c]</div>
+                    <p>DFS continues through the graph</p>
+                </div>
+                <div class="step">
+                    <div class="step-title">5. Returns cloned_a</div>
+                    <p>Final result is the starting node of cloned graph</p>
+                </div>
+            </div>
+        </div>
+
+        <button class="collapsible">💻 Code Analysis with Syntax Highlighting</button>
+        <div class="content">
+            <div class="code-block"><span class="keyword">from</span> <span class="variable">ds</span> <span class="keyword">import</span> <span class="function">GraphNode</span>
+
+<span class="comment">"""
+Definition of GraphNode:
+class GraphNode:
+    def __init__(self, val):
+        self.val = val
+        self.neighbors = []
+"""</span>
+
+
+<span class="keyword">def</span> <span class="function">graph_deep_copy</span>(<span class="variable">node</span>: <span class="function">GraphNode</span>) -> <span class="function">GraphNode</span>:
+    <span class="comment"># Entry point: handle None case and start DFS</span>
+    <span class="keyword">if</span> <span class="keyword">not</span> <span class="variable">node</span>:
+        <span class="keyword">return</span> <span class="keyword">None</span>
+    <span class="keyword">return</span> <span class="function">dfs</span>(<span class="variable">node</span>)
+
+<span class="keyword">def</span> <span class="function">dfs</span>(<span class="variable">node</span>: <span class="function">GraphNode</span>, <span class="variable">clone_map</span> = {}) -> <span class="function">GraphNode</span>:
+    <span class="comment"># If this node was already cloned, return the existing clone</span>
+    <span class="keyword">if</span> <span class="variable">node</span> <span class="keyword">in</span> <span class="variable">clone_map</span>:
+        <span class="keyword">return</span> <span class="variable">clone_map</span>[<span class="variable">node</span>]
+    
+    <span class="comment"># Clone the current node</span>
+    <span class="variable">cloned_node</span> = <span class="function">GraphNode</span>(<span class="variable">node</span>.<span class="variable">val</span>)
+    
+    <span class="comment"># Store the clone to prevent infinite recursion</span>
+    <span class="variable">clone_map</span>[<span class="variable">node</span>] = <span class="variable">cloned_node</span>
+    
+    <span class="comment"># Recursively clone all neighbors</span>
+    <span class="keyword">for</span> <span class="variable">neighbor</span> <span class="keyword">in</span> <span class="variable">node</span>.<span class="variable">neighbors</span>:
+        <span class="variable">cloned_neighbor</span> = <span class="function">dfs</span>(<span class="variable">neighbor</span>, <span class="variable">clone_map</span>)
+        <span class="variable">cloned_node</span>.<span class="variable">neighbors</span>.<span class="function">append</span>(<span class="variable">cloned_neighbor</span>)
+    
+    <span class="keyword">return</span> <span class="variable">cloned_node</span></div>
+            
+            <div class="warning">
+                <strong>⚠️ Important Note:</strong> The default mutable parameter <code>clone_map = {}</code> is shared across all calls. This works for single graph cloning but could cause issues in multiple calls. Better practice: <code>clone_map = None</code> then <code>if clone_map is None: clone_map = {}</code>
+            </div>
+        </div>
+
+        <button class="collapsible">🚶‍♂️ Step-by-Step Walkthrough: Example 1</button>
+        <div class="content">
+            <h3>Graph Structure: Square with Cross Connections</h3>
+            <div class="visual-graph">
+                <svg class="graph-svg" width="300" height="300" viewBox="0 0 300 300" style="margin: 0 auto;">
+                    <!-- Square edges -->
+                    <line class="edge" x1="100" y1="100" x2="200" y2="100"/>
+                    <line class="edge" x1="100" y1="100" x2="100" y2="200"/>
+                    <line class="edge" x1="200" y1="100" x2="200" y2="200"/>
+                    <line class="edge" x1="100" y1="200" x2="200" y2="200"/>
+                    
+                    <!-- Nodes -->
+                    <circle class="node" cx="100" cy="100" r="30"/>
+                    <text class="node-text" x="100" y="100" style="font-size: 18px;">0</text>
+                    
+                    <circle class="node" cx="200" cy="100" r="30"/>
+                    <text class="node-text" x="200" y="100" style="font-size: 18px;">1</text>
+                    
+                    <circle class="node" cx="100" cy="200" r="30"/>
+                    <text class="node-text" x="100" y="200" style="font-size: 18px;">2</text>
+                    
+                    <circle class="node" cx="200" cy="200" r="30"/>
+                    <text class="node-text" x="200" y="200" style="font-size: 18px;">3</text>
+                    
+                    <!-- Labels for connections -->
+                    <text x="150" y="90" fill="#4ec9b0" text-anchor="middle" font-size="12">0 ↔ 1</text>
+                    <text x="80" y="150" fill="#4ec9b0" text-anchor="middle" font-size="12">0 ↔ 2</text>
+                    <text x="220" y="150" fill="#4ec9b0" text-anchor="middle" font-size="12">1 ↔ 3</text>
+                    <text x="150" y="220" fill="#4ec9b0" text-anchor="middle" font-size="12">2 ↔ 3</text>
+                </svg>
+                <p style="color: #4ec9b0; margin-top: 15px;">Adjacency: 0↔[1,2], 1↔[0,3], 2↔[0,3], 3↔[1,2]</p>
+            </div>
+
+            <div class="step">
+                <div class="step-title">Step 1: Initial Call - dfs(node_0)</div>
+                <div class="state-display">
+Current node: 0
+clone_map: {}
+Action: Create clone of node 0
+Result: clone_map = {node_0: cloned_0}
+                </div>
+                <p>✅ Node 0 is not in clone_map, so we create <span class="highlight">cloned_0 = GraphNode(0)</span></p>
+            </div>
+
+            <div class="step">
+                <div class="step-title">Step 2: Process neighbors of node 0 → [1, 2]</div>
+                <div class="state-display">
+Current node: 0
+Neighbors to process: [1, 2]
+Processing neighbor: 1
+                </div>
+                <p>🔄 Recursive call: <span class="highlight">dfs(node_1, clone_map)</span></p>
+            </div>
+
+            <div class="step">
+                <div class="step-title">Step 3: dfs(node_1) - Create clone of node 1</div>
+                <div class="state-display">
+Current node: 1
+clone_map: {node_0: cloned_0}
+Action: Create clone of node 1
+Result: clone_map = {node_0: cloned_0, node_1: cloned_1}
+                </div>
+                <p>✅ Node 1 not in clone_map, create <span class="highlight">cloned_1 = GraphNode(1)</span></p>
+            </div>
+
+            <div class="step">
+                <div class="step-title">Step 4: Process neighbors of node 1 → [0, 3]</div>
+                <div class="state-display">
+Processing neighbor: 0
+node_0 found in clone_map!
+Return: cloned_0 (already exists)
+Add cloned_0 to cloned_1.neighbors
+                </div>
+                <p>🔄 Node 0 already cloned, return existing clone</p>
+                <p>🔄 Next: Recursive call <span class="highlight">dfs(node_3, clone_map)</span></p>
+            </div>
+
+            <div class="step">
+                <div class="step-title">Step 5: dfs(node_3) - Create clone of node 3</div>
+                <div class="state-display">
+Current node: 3
+clone_map: {node_0: cloned_0, node_1: cloned_1}
+Action: Create clone of node 3
+Result: clone_map = {node_0: cloned_0, node_1: cloned_1, node_3: cloned_3}
+                </div>
+                <p>✅ Create <span class="highlight">cloned_3 = GraphNode(3)</span></p>
+            </div>
+
+            <div class="step">
+                <div class="step-title">Step 6: Process neighbors of node 3 → [1, 2]</div>
+                <div class="state-display">
+Processing neighbor: 1
+node_1 found in clone_map!
+Return: cloned_1 (already exists)
+Add cloned_1 to cloned_3.neighbors
+
+Processing neighbor: 2
+node_2 NOT in clone_map
+Recursive call: dfs(node_2, clone_map)
+                </div>
+                <p>🔄 Node 1 already exists, node 2 needs to be cloned</p>
+            </div>
+
+            <div class="step">
+                <div class="step-title">Step 7: dfs(node_2) - Create clone of node 2</div>
+                <div class="state-display">
+Current node: 2
+Action: Create clone of node 2
+Final clone_map: {node_0: cloned_0, node_1: cloned_1, node_3: cloned_3, node_2: cloned_2}
+                </div>
+                <p>✅ Create <span class="highlight">cloned_2 = GraphNode(2)</span></p>
+                <p>🔄 Process neighbors: [0, 3] - both already in clone_map!</p>
+            </div>
+
+            <div class="step">
+                <div class="step-title">Step 8: Backtrack and Complete Connections</div>
+                <div class="state-display">
+Final neighbor connections:
+cloned_0.neighbors = [cloned_1, cloned_2]
+cloned_1.neighbors = [cloned_0, cloned_3]  
+cloned_2.neighbors = [cloned_0, cloned_3]
+cloned_3.neighbors = [cloned_1, cloned_2]
+                </div>
+                <p>✅ All nodes cloned and connected. Return <span class="highlight">cloned_0</span></p>
+            </div>
+        </div>
+
+        <button class="collapsible">🔄 Step-by-Step Walkthrough: Example 2 (Cycle)</button>
+        <div class="content">
+            <h3>Triangle Graph with Cycle</h3>
+            <div class="visual-graph">
+                <svg class="graph-svg" width="250" height="250" viewBox="0 0 250 250" style="margin: 0 auto;">
+                    <!-- Triangle edges -->
+                    <line class="edge" x1="125" y1="80" x2="80" y2="170"/>
+                    <line class="edge" x1="125" y1="80" x2="170" y2="170"/>
+                    <line class="edge" x1="80" y1="170" x2="170" y2="170"/>
+                    
+                    <!-- Nodes -->
+                    <circle class="node" cx="125" cy="80" r="25"/>
+                    <text class="node-text" x="125" y="80" style="font-size: 16px;">0</text>
+                    
+                    <circle class="node" cx="80" cy="170" r="25"/>
+                    <text class="node-text" x="80" y="170" style="font-size: 16px;">1</text>
+                    
+                    <circle class="node" cx="170" cy="170" r="25"/>
+                    <text class="node-text" x="170" y="170" style="font-size: 16px;">2</text>
+                    
+                    <!-- Connection labels -->
+                    <text x="95" y="115" fill="#4ec9b0" text-anchor="middle" font-size="11">0↔1</text>
+                    <text x="155" y="115" fill="#4ec9b0" text-anchor="middle" font-size="11">0↔2</text>
+                    <text x="125" y="185" fill="#4ec9b0" text-anchor="middle" font-size="11">1↔2</text>
+                </svg>
+                <p style="color: #4ec9b0; margin-top: 15px;">Adjacency: 0↔[1,2], 1↔[0,2], 2↔[0,1]</p>
+            </div>
+
+            <div class="step">
+                <div class="step-title">Step 1: Start at node 0</div>
+                <div class="state-display">
+clone_map: {}
+Create: cloned_0 = GraphNode(0)
+clone_map: {node_0: cloned_0}
+Process neighbors: [1, 2]
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">Step 2: Process neighbor 1</div>
+                <div class="state-display">
+dfs(node_1):
+Create: cloned_1 = GraphNode(1)  
+clone_map: {node_0: cloned_0, node_1: cloned_1}
+Process neighbors of 1: [0, 2]
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">Step 3: Cycle Detection in Action</div>
+                <div class="state-display">
+Processing neighbor 0 of node_1:
+node_0 FOUND in clone_map! ✅
+Return existing cloned_0
+Add to cloned_1.neighbors
+
+Processing neighbor 2 of node_1:
+node_2 NOT in clone_map
+Create: cloned_2 = GraphNode(2)
+                </div>
+                <p>🎯 <strong>Key Insight:</strong> When we encounter node 0 again, we don't create a new clone!</p>
+            </div>
+
+            <div class="step">
+                <div class="step-title">Step 4: Complete the Triangle</div>
+                <div class="state-display">
+Processing neighbors of node_2: [0, 1]
+Both node_0 and node_1 already in clone_map!
+Return existing clones
+Final connections:
+- cloned_0.neighbors = [cloned_1, cloned_2]
+- cloned_1.neighbors = [cloned_0, cloned_2]
+- cloned_2.neighbors = [cloned_0, cloned_1]
+                </div>
+                <p>✅ Triangle successfully cloned without infinite recursion!</p>
+            </div>
+        </div>
+
+        <button class="collapsible">🧪 Multiple Test Cases & Edge Cases</button>
+        <div class="content">
+            <div class="test-case">
+                <h3>Test Case 1: Single Node (No Neighbors)</h3>
+                <div class="code-block"><span class="comment"># Input: node with value 42, no neighbors</span>
+<span class="variable">single_node</span> = <span class="function">GraphNode</span>(<span class="number">42</span>)
+<span class="variable">cloned</span> = <span class="function">graph_deep_copy</span>(<span class="variable">single_node</span>)
+
+<span class="comment"># Result:</span>
+<span class="comment"># cloned.val == 42</span>
+<span class="comment"># cloned.neighbors == []</span>
+<span class="comment"># cloned is not single_node (different object)</span></div>
+                <p><strong>Expected:</strong> Creates a single cloned node with no connections</p>
+            </div>
+
+            <div class="test-case">
+                <h3>Test Case 2: Linear Chain</h3>
+                <div class="code-block"><span class="comment"># Input: 0 - 1 - 2 - 3</span>
+<span class="variable">chain</span> = <span class="function">build_chain</span>([<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>])
+<span class="variable">cloned</span> = <span class="function">graph_deep_copy</span>(<span class="variable">chain</span>)
+
+<span class="comment"># DFS Trace:</span>
+<span class="comment"># dfs(0) → dfs(1) → dfs(2) → dfs(3)</span>
+<span class="comment"># Each recursive call goes deeper until reaching leaf</span></div>
+                <p><strong>Expected:</strong> Sequential cloning without any cycles to handle</p>
+            </div>
+
+            <div class="test-case">
+                <h3>Test Case 3: Star Graph (One Central Node)</h3>
+                <div class="code-block"><span class="comment"># Input: Central node 0 connected to nodes 1,2,3,4</span>
+<span class="comment">#     1</span>
+<span class="comment">#     │</span>
+<span class="comment"># 2 ─ 0 ─ 3</span>
+<span class="comment">#     │</span>
+<span class="comment">#     4</span>
+
+<span class="variable">star</span> = <span class="function">build_star</span>(<span class="number">0</span>, [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>])
+<span class="variable">cloned</span> = <span class="function">graph_deep_copy</span>(<span class="variable">star</span>)</div>
+                <p><strong>Expected:</strong> Central node cloned first, then all leaf nodes sequentially</p>
+            </div>
+
+            <div class="test-case">
+                <h3>Test Case 4: Complete Graph (Every Node Connected)</h3>
+                <div class="visual-graph">
+                    <h4>4-Node Complete Graph</h4>
+                    <svg class="graph-svg" width="250" height="250" viewBox="0 0 250 250" style="margin: 0 auto;">
+                        <!-- All possible edges in complete graph -->
+                        <line class="edge" x1="80" y1="80" x2="170" y2="80"/>
+                        <line class="edge" x1="80" y1="80" x2="80" y2="170"/>
+                        <line class="edge" x1="80" y1="80" x2="170" y2="170"/>
+                        <line class="edge" x1="170" y1="80" x2="170" y2="170"/>
+                        <line class="edge" x1="170" y1="80" x2="80" y2="170"/>
+                        <line class="edge" x1="80" y1="170" x2="170" y2="170"/>
+                        
+                        <!-- Nodes -->
+                        <circle class="node" cx="80" cy="80" r="25"/>
+                        <text class="node-text" x="80" y="80">0</text>
+                        
+                        <circle class="node" cx="170" cy="80" r="25"/>
+                        <text class="node-text" x="170" y="80">1</text>
+                        
+                        <circle class="node" cx="80" cy="170" r="25"/>
+                        <text class="node-text" x="80" y="170">2</text>
+                        
+                        <circle class="node" cx="170" cy="170" r="25"/>
+                        <text class="node-text" x="170" y="170">3</text>
+                    </svg>
+                    <p style="color: #4ec9b0; margin-top: 10px;">Every node connected to every other node</p>
+                </div>
+                <p><strong>Challenge:</strong> High degree of connectivity tests the clone_map efficiency</p>
+            </div>
+        </div>
+
+        <button class="collapsible">📊 Algorithm Analysis & Complexity</button>
+        <div class="content">
+            <div class="complexity-box">
+                <h3>⏱️ Time Complexity: O(V + E)</h3>
+                <ul>
+                    <li><strong>V = Number of vertices (nodes)</strong> - Each node visited exactly once</li>
+                    <li><strong>E = Number of edges</strong> - Each edge traversed exactly once</li>
+                    <li><strong>HashMap lookups:</strong> O(1) average case for clone_map operations</li>
+                </ul>
+            </div>
+
+            <div class="complexity-box">
+                <h3>💾 Space Complexity: O(V)</h3>
+                <ul>
+                    <li><strong>clone_map storage:</strong> O(V) - stores one entry per node</li>
+                    <li><strong>Recursion stack:</strong> O(H) where H is max depth of DFS tree</li>
+                    <li><strong>Cloned graph storage:</strong> O(V + E) for the result</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h3>🎯 Why This Algorithm Works</h3>
+                <table>
+                    <tr>
+                        <th>Problem</th>
+                        <th>Solution</th>
+                        <th>Mechanism</th>
+                    </tr>
+                    <tr>
+                        <td>Infinite cycles</td>
+                        <td>Cycle detection</td>
+                        <td>Check clone_map before creating new nodes</td>
+                    </tr>
+                    <tr>
+                        <td>Duplicate work</td>
+                        <td>Memoization</td>
+                        <td>Store cloned nodes in hashmap</td>
+                    </tr>
+                    <tr>
+                        <td>Reference sharing</td>
+                        <td>Deep copying</td>
+                        <td>Create new GraphNode instances</td>
+                    </tr>
+                    <tr>
+                        <td>Missing connections</td>
+                        <td>Recursive traversal</td>
+                        <td>DFS ensures all reachable nodes processed</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="section">
+                <h3>🚀 Optimization Opportunities</h3>
+                <ul>
+                    <li><strong>BFS Alternative:</strong> Could use iterative BFS with queue for non-recursive approach</li>
+                    <li><strong>Memory Pool:</strong> Pre-allocate nodes if graph size is known</li>
+                    <li><strong>Parallel Processing:</strong> Independent subgraphs could be processed in parallel</li>
+                    <li><strong>Clone_map as Parameter:</strong> Fix the mutable default parameter issue</li>
+                </ul>
+            </div>
+        </div>
+
+        <button class="collapsible">🔧 Practical Implementation & Testing</button>
+        <div class="content">
+            <div class="code-block"><span class="comment"># Complete implementation with test harness</span>
+
+<span class="keyword">class</span> <span class="function">GraphNode</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(<span class="variable">self</span>, <span class="variable">val</span>):
+        <span class="variable">self</span>.<span class="variable">val</span> = <span class="variable">val</span>
+        <span class="variable">self</span>.<span class="variable">neighbors</span> = []
+    
+    <span class="keyword">def</span> <span class="function">add_neighbor</span>(<span class="variable">self</span>, <span class="variable">neighbor</span>):
+        <span class="variable">self</span>.<span class="variable">neighbors</span>.<span class="function">append</span>(<span class="variable">neighbor</span>)
+        <span class="variable">neighbor</span>.<span class="variable">neighbors</span>.<span class="function">append</span>(<span class="variable">self</span>)
+
+
+<span class="keyword">def</span> <span class="function">graph_deep_copy</span>(<span class="variable">node</span>: <span class="function">GraphNode</span>) -> <span class="function">GraphNode</span>:
+    <span class="keyword">if</span> <span class="keyword">not</span> <span class="variable">node</span>:
+        <span class="keyword">return</span> <span class="keyword">None</span>
+    <span class="keyword">return</span> <span class="function">dfs</span>(<span class="variable">node</span>, {})  <span class="comment"># Fixed: pass empty dict</span>
+
+
+<span class="keyword">def</span> <span class="function">dfs</span>(<span class="variable">node</span>: <span class="function">GraphNode</span>, <span class="variable">clone_map</span>: <span class="function">dict</span>) -> <span class="function">GraphNode</span>:
+    <span class="keyword">if</span> <span class="variable">node</span> <span class="keyword">in</span> <span class="variable">clone_map</span>:
+        <span class="keyword">return</span> <span class="variable">clone_map</span>[<span class="variable">node</span>]
+    
+    <span class="variable">cloned_node</span> = <span class="function">GraphNode</span>(<span class="variable">node</span>.<span class="variable">val</span>)
+    <span class="variable">clone_map</span>[<span class="variable">node</span>] = <span class="variable">cloned_node</span>
+    
+    <span class="keyword">for</span> <span class="variable">neighbor</span> <span class="keyword">in</span> <span class="variable">node</span>.<span class="variable">neighbors</span>:
+        <span class="variable">cloned_neighbor</span> = <span class="function">dfs</span>(<span class="variable">neighbor</span>, <span class="variable">clone_map</span>)
+        <span class="variable">cloned_node</span>.<span class="variable">neighbors</span>.<span class="function">append</span>(<span class="variable">cloned_neighbor</span>)
+    
+    <span class="keyword">return</span> <span class="variable">cloned_node</span>
+
+
+<span class="comment"># Test function to verify correctness</span>
+<span class="keyword">def</span> <span class="function">verify_clone</span>(<span class="variable">original</span>, <span class="variable">cloned</span>, <span class="variable">visited</span>=<span class="keyword">None</span>):
+    <span class="keyword">if</span> <span class="variable">visited</span> <span class="keyword">is</span> <span class="keyword">None</span>:
+        <span class="variable">visited</span> = <span class="function">set</span>()
+    
+    <span class="keyword">if</span> <span class="variable">original</span> <span class="keyword">in</span> <span class="variable">visited</span>:
+        <span class="keyword">return</span> <span class="keyword">True</span>
+    
+    <span class="variable">visited</span>.<span class="function">add</span>(<span class="variable">original</span>)
+    
+    <span class="comment"># Check values match but objects are different</span>
+    <span class="keyword">assert</span> <span class="variable">original</span>.<span class="variable">val</span> == <span class="variable">cloned</span>.<span class="variable">val</span>
+    <span class="keyword">assert</span> <span class="variable">original</span> <span class="keyword">is</span> <span class="keyword">not</span> <span class="variable">cloned</span>  <span class="comment"># Different objects!</span>
+    <span class="keyword">assert</span> <span class="function">len</span>(<span class="variable">original</span>.<span class="variable">neighbors</span>) == <span class="function">len</span>(<span class="variable">cloned</span>.<span class="variable">neighbors</span>)
+    
+    <span class="keyword">return</span> <span class="keyword">True</span>
+
+
+<span class="comment"># Example usage:</span>
+<span class="variable">node0</span> = <span class="function">GraphNode</span>(<span class="number">0</span>)
+<span class="variable">node1</span> = <span class="function">GraphNode</span>(<span class="number">1</span>)
+<span class="variable">node2</span> = <span class="function">GraphNode</span>(<span class="number">2</span>)
+
+<span class="variable">node0</span>.<span class="function">add_neighbor</span>(<span class="variable">node1</span>)
+<span class="variable">node1</span>.<span class="function">add_neighbor</span>(<span class="variable">node2</span>)
+<span class="variable">node2</span>.<span class="function">add_neighbor</span>(<span class="variable">node0</span>)  <span class="comment"># Creates triangle</span>
+
+<span class="variable">cloned_graph</span> = <span class="function">graph_deep_copy</span>(<span class="variable">node0</span>)
+<span class="function">print</span>(<span class="string">f"Original node0 id: {id(node0)}"</span>)
+<span class="function">print</span>(<span class="string">f"Cloned node0 id: {id(cloned_graph)}"</span>)
+<span class="function">print</span>(<span class="string">f"Values match: {node0.val == cloned_graph.val}"</span>)
+<span class="function">print</span>(<span class="string">f"Different objects: {node0 is not cloned_graph}"</span>)</div>
+        </div>
+
+        <button class="collapsible">💡 Key Insights & Common Pitfalls</button>
+        <div class="content">
+            <div class="section">
+                <h3>🎯 Critical Success Factors</h3>
+                <ul>
+                    <li><strong>HashMap Before Creation:</strong> Always check clone_map before creating new nodes</li>
+                    <li><strong>Store Before Recursion:</strong> Add to clone_map immediately after creation to prevent cycles</li>
+                    <li><strong>Pass Clone_map:</strong> Ensure the same hashmap is used across all recursive calls</li>
+                    <li><strong>Deep vs Shallow:</strong> Create new GraphNode objects, don't copy references</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h3>⚠️ Common Mistakes</h3>
+                <ul>
+                    <li><strong>Stack Overflow:</strong> Not checking clone_map leads to infinite recursion in cycles</li>
+                    <li><strong>Duplicate Nodes:</strong> Creating multiple clones of the same original node</li>
+                    <li><strong>Lost Connections:</strong> Forgetting to connect neighbors in the cloned graph</li>
+                    <li><strong>Reference Leaks:</strong> Accidentally sharing objects between original and clone</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h3>🚀 Real-World Applications</h3>
+                <ul>
+                    <li><strong>Game State Cloning:</strong> Save/restore game states with complex object relationships</li>
+                    <li><strong>Undo/Redo Systems:</strong> Create snapshots of complex data structures</li>
+                    <li><strong>Parallel Processing:</strong> Clone graphs for simultaneous processing</li>
+                    <li><strong>Testing:</strong> Create isolated copies for unit test scenarios</li>
+                    <li><strong>Version Control:</strong> Branch complex object hierarchies</li>
+                </ul>
+            </div>
+
+            <div class="complexity-box">
+                <h3>🎓 Learning Takeaways</h3>
+                <p><strong>Pattern Recognition:</strong> This algorithm demonstrates the classic "visited set" pattern used in graph traversal, but adapted for cloning rather than just visiting.</p>
+                <p><strong>Memory Management:</strong> Shows how careful object creation and reference management prevents both memory leaks and infinite recursion.</p>
+                <p><strong>DFS vs BFS:</strong> DFS was chosen here for its natural recursive structure, but BFS with a queue would work equally well.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add interactivity to collapsible sections
+        const collapsibles = document.querySelectorAll('.collapsible');
+        
+        collapsibles.forEach(button => {
+            button.addEventListener('click', function() {
+                this.classList.toggle('active');
+                const content = this.nextElementSibling;
+                content.classList.toggle('show');
+                
+                if (content.classList.contains('show')) {
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                } else {
+                    content.style.maxHeight = '0px';
+                }
+            });
+        });
+
+        // Auto-expand first section
+        document.querySelector('.collapsible').click();
+    </script>
+</body>
+</html>
