@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Count Islands Algorithm Explained</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #569cd6;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            color: #4ec9b0;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #4ec9b0;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #dcdcaa;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .section {
+            background: #252526;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 1px solid #3e3e42;
+        }
+
+        .collapsible {
+            background: #2d2d30;
+            color: #d4d4d4;
+            cursor: pointer;
+            padding: 15px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 16px;
+            border-radius: 5px;
+            margin: 10px 0;
+            transition: background-color 0.3s;
+        }
+
+        .collapsible:hover {
+            background: #3e3e42;
+        }
+
+        .collapsible.active {
+            background: #0e639c;
+        }
+
+        .content {
+            padding: 0 15px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background: #1e1e1e;
+            border-radius: 0 0 5px 5px;
+        }
+
+        .content.active {
+            max-height: none;
+            padding: 20px 15px;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            border: 1px solid #3e3e42;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            line-height: 1.8;
+            overflow-x: auto;
+        }
+
+        .keyword { color: #c586c0; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .number { color: #b5cea8; }
+        .function { color: #dcdcaa; }
+        .variable { color: #9cdcfe; }
+        .type { color: #4ec9b0; }
+
+        .matrix-grid {
+            display: grid;
+            gap: 2px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .matrix-4x4 { grid-template-columns: repeat(4, 60px); }
+        .matrix-3x3 { grid-template-columns: repeat(3, 60px); }
+
+        .cell {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            border: 2px solid #3e3e42;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .cell.land { background: #4ec9b0; color: #1e1e1e; }
+        .cell.water { background: #264f78; color: #d4d4d4; }
+        .cell.visited { background: #f44747; color: #fff; }
+        .cell.current { 
+            border: 3px solid #dcdcaa; 
+            box-shadow: 0 0 10px #dcdcaa;
+        }
+
+        .step {
+            background: #2d2d30;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #4ec9b0;
+        }
+
+        .step-title {
+            color: #dcdcaa;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .flowchart {
+            background: #252526;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .flow-box {
+            display: inline-block;
+            background: #0e639c;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 10px;
+            position: relative;
+        }
+
+        .flow-decision {
+            background: #f44747;
+            clip-path: polygon(20% 0%, 80% 0%, 100% 50%, 80% 100%, 20% 100%, 0% 50%);
+            padding: 15px 30px;
+        }
+
+        .arrow {
+            font-size: 24px;
+            color: #4ec9b0;
+            margin: 0 10px;
+        }
+
+        .complexity-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .complexity-table th,
+        .complexity-table td {
+            border: 1px solid #3e3e42;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .complexity-table th {
+            background: #2d2d30;
+            color: #4ec9b0;
+        }
+
+        .highlight {
+            background: #264f78;
+            color: #d4d4d4;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .island-label {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #f44747;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .variables-state {
+            background: #2d2d30;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            border-left: 4px solid #dcdcaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏝️ Count Islands Algorithm</h1>
+        
+        <div class="section">
+            <h2>🎯 Algorithm Overview</h2>
+            <p>The Count Islands algorithm uses <strong>Depth-First Search (DFS)</strong> to identify and count connected components of land cells in a binary matrix. Each island is a group of adjacent land cells (1s) connected horizontally or vertically.</p>
+            
+            <div class="flowchart">
+                <div class="flow-box">Start: Scan Matrix</div>
+                <div class="arrow">↓</div>
+                <div class="flow-decision">Found Land (1)?</div>
+                <div class="arrow">↓ Yes</div>
+                <div class="flow-box">DFS to Mark Island</div>
+                <div class="arrow">↓</div>
+                <div class="flow-box">Increment Count</div>
+                <div class="arrow">↓</div>
+                <div class="flow-box">Continue Scanning</div>
+            </div>
+        </div>
+
+        <button class="collapsible">📝 Code Breakdown with Proper Formatting</button>
+        <div class="content">
+            <h3>Main Function: count_islands</h3>
+            <div class="code-block"><span class="keyword">from</span> <span class="variable">typing</span> <span class="keyword">import</span> <span class="type">List</span>
+
+
+<span class="keyword">def</span> <span class="function">count_islands</span>(<span class="variable">matrix</span>: <span class="type">List</span>[<span class="type">List</span>[<span class="type">int</span>]]) -> <span class="type">int</span>:
+    <span class="comment"># Handle empty matrix edge case</span>
+    <span class="keyword">if</span> <span class="keyword">not</span> <span class="variable">matrix</span>:
+        <span class="keyword">return</span> <span class="number">0</span>
+    
+    <span class="comment"># Initialize island counter</span>
+    <span class="variable">count</span> = <span class="number">0</span>
+    
+    <span class="comment"># Iterate through each cell in the matrix</span>
+    <span class="keyword">for</span> <span class="variable">r</span> <span class="keyword">in</span> <span class="function">range</span>(<span class="function">len</span>(<span class="variable">matrix</span>)):
+        <span class="keyword">for</span> <span class="variable">c</span> <span class="keyword">in</span> <span class="function">range</span>(<span class="function">len</span>(<span class="variable">matrix</span>[<span class="number">0</span>])):
+            <span class="comment"># If a land cell is found, perform DFS to explore the full</span>
+            <span class="comment"># island, and include this island in our count.</span>
+            <span class="keyword">if</span> <span class="variable">matrix</span>[<span class="variable">r</span>][<span class="variable">c</span>] == <span class="number">1</span>:
+                <span class="function">dfs</span>(<span class="variable">r</span>, <span class="variable">c</span>, <span class="variable">matrix</span>)
+                <span class="variable">count</span> += <span class="number">1</span>
+    
+    <span class="keyword">return</span> <span class="variable">count</span></div>
+
+            <h3>DFS Helper Function</h3>
+            <div class="code-block"><span class="keyword">def</span> <span class="function">dfs</span>(<span class="variable">r</span>: <span class="type">int</span>, <span class="variable">c</span>: <span class="type">int</span>, <span class="variable">matrix</span>: <span class="type">List</span>[<span class="type">List</span>[<span class="type">int</span>]]) -> <span class="type">None</span>:
+    <span class="comment"># Mark the current land cell as visited by setting it to -1</span>
+    <span class="variable">matrix</span>[<span class="variable">r</span>][<span class="variable">c</span>] = <span class="number">-1</span>
+    
+    <span class="comment"># Define direction vectors for up, down, left, and right</span>
+    <span class="variable">dirs</span> = [(<span class="number">-1</span>, <span class="number">0</span>), (<span class="number">1</span>, <span class="number">0</span>), (<span class="number">0</span>, <span class="number">-1</span>), (<span class="number">0</span>, <span class="number">1</span>)]
+    
+    <span class="comment"># Recursively call DFS on each neighboring land cell to continue</span>
+    <span class="comment"># exploring this island</span>
+    <span class="keyword">for</span> <span class="variable">d</span> <span class="keyword">in</span> <span class="variable">dirs</span>:
+        <span class="variable">next_r</span>, <span class="variable">next_c</span> = <span class="variable">r</span> + <span class="variable">d</span>[<span class="number">0</span>], <span class="variable">c</span> + <span class="variable">d</span>[<span class="number">1</span>]
+        <span class="keyword">if</span> <span class="function">is_within_bounds</span>(<span class="variable">next_r</span>, <span class="variable">next_c</span>, <span class="variable">matrix</span>) <span class="keyword">and</span> <span class="variable">matrix</span>[<span class="variable">next_r</span>][<span class="variable">next_c</span>] == <span class="number">1</span>:
+            <span class="function">dfs</span>(<span class="variable">next_r</span>, <span class="variable">next_c</span>, <span class="variable">matrix</span>)</div>
+
+            <h3>Bounds Checking Helper</h3>
+            <div class="code-block"><span class="keyword">def</span> <span class="function">is_within_bounds</span>(<span class="variable">r</span>: <span class="type">int</span>, <span class="variable">c</span>: <span class="type">int</span>, <span class="variable">matrix</span>: <span class="type">List</span>[<span class="type">List</span>[<span class="type">int</span>]]) -> <span class="type">bool</span>:
+    <span class="comment"># Check if row and column indices are within matrix boundaries</span>
+    <span class="keyword">return</span> <span class="number">0</span> <= <span class="variable">r</span> < <span class="function">len</span>(<span class="variable">matrix</span>) <span class="keyword">and</span> <span class="number">0</span> <= <span class="variable">c</span> < <span class="function">len</span>(<span class="variable">matrix</span>[<span class="number">0</span>])</div>
+        </div>
+
+        <button class="collapsible">🔍 Step-by-Step Walkthrough - Example 1</button>
+        <div class="content">
+            <h3>Initial Matrix (4×4)</h3>
+            <p>Let's trace through the given example:</p>
+            
+            <div class="matrix-grid matrix-4x4">
+                <div class="cell land">1</div>
+                <div class="cell land">1</div>
+                <div class="cell water">0</div>
+                <div class="cell water">0</div>
+                <div class="cell land">1</div>
+                <div class="cell land">1</div>
+                <div class="cell water">0</div>
+                <div class="cell water">0</div>
+                <div class="cell water">0</div>
+                <div class="cell water">0</div>
+                <div class="cell land">1</div>
+                <div class="cell land">1</div>
+                <div class="cell water">0</div>
+                <div class="cell water">0</div>
+                <div class="cell water">0</div>
+                <div class="cell land">1</div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">Step 1: Start at (0,0)</div>
+                <div class="variables-state">count = 0, r = 0, c = 0
+matrix[0][0] = 1 ← Found land!</div>
+                <p>We found our first land cell. Now we call <span class="highlight">dfs(0, 0, matrix)</span> to explore this entire island.</p>
+                
+                <div class="matrix-grid matrix-4x4">
+                    <div class="cell current land">1</div>
+                    <div class="cell land">1</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell land">1</div>
+                    <div class="cell land">1</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell land">1</div>
+                    <div class="cell land">1</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell land">1</div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">Step 2: DFS Exploration of First Island</div>
+                <div class="variables-state">DFS at (0,0): matrix[0][0] = -1 (visited)
+Checking neighbors: (0,1) → land, continue DFS
+DFS at (0,1): matrix[0][1] = -1 (visited)
+DFS at (1,0): matrix[1][0] = -1 (visited)  
+DFS at (1,1): matrix[1][1] = -1 (visited)</div>
+                
+                <div class="matrix-grid matrix-4x4">
+                    <div class="cell visited">-1</div>
+                    <div class="cell visited">-1</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell visited">-1</div>
+                    <div class="cell visited">-1</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell land">1</div>
+                    <div class="cell land">1</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell land">1</div>
+                </div>
+                
+                <div class="variables-state">count = 1 ← First island completed!</div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">Step 3: Continue Scanning</div>
+                <p>We continue scanning and skip all visited cells (-1) and water cells (0) until we reach (2,2).</p>
+                
+                <div class="variables-state">Scanning: (0,2)=0, (0,3)=0, (1,2)=0, (1,3)=0, (2,0)=0, (2,1)=0
+r = 2, c = 2: matrix[2][2] = 1 ← Found second island!</div>
+                
+                <div class="matrix-grid matrix-4x4">
+                    <div class="cell visited">-1</div>
+                    <div class="cell visited">-1</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell visited">-1</div>
+                    <div class="cell visited">-1</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell current land">1</div>
+                    <div class="cell land">1</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell land">1</div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">Step 4: DFS Exploration of Second Island</div>
+                <div class="variables-state">DFS at (2,2): matrix[2][2] = -1 (visited)
+Checking neighbors: (2,3) → land, continue DFS
+DFS at (2,3): matrix[2][3] = -1 (visited)
+DFS at (3,3): matrix[3][3] = -1 (visited)</div>
+                
+                <div class="matrix-grid matrix-4x4">
+                    <div class="cell visited">-1</div>
+                    <div class="cell visited">-1</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell visited">-1</div>
+                    <div class="cell visited">-1</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell visited">-1</div>
+                    <div class="cell visited">-1</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell water">0</div>
+                    <div class="cell visited">-1</div>
+                </div>
+                
+                <div class="variables-state">count = 2 ← Second island completed!</div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">Final Result</div>
+                <div class="variables-state">Final count = 2 islands</div>
+                <p>The algorithm correctly identified <strong>2 distinct islands</strong> in the matrix!</p>
+            </div>
+        </div>
+
+        <button class="collapsible">🔍 Step-by-Step Walkthrough - Example 2</button>
+        <div class="content">
+            <h3>Second Example: Scattered Islands (3×3)</h3>
+            
+            <div class="matrix-grid matrix-3x3">
+                <div class="cell land">1</div>
+                <div class="cell water">0</div>
+                <div class="cell land">1</div>
+                <div class="cell water">0</div>
+                <div class="cell water">0</div>
+                <div class="cell water">0</div>
+                <div class="cell land">1</div>
+                <div class="cell water">0</div>
+                <div class="cell land">1</div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">Execution Trace</div>
+                <div class="variables-state">count = 0
+
+Step 1: (0,0) = 1 → DFS marks (0,0) as -1 → count = 1
+Step 2: (0,2) = 1 → DFS marks (0,2) as -1 → count = 2  
+Step 3: (2,0) = 1 → DFS marks (2,0) as -1 → count = 3
+Step 4: (2,2) = 1 → DFS marks (2,2) as -1 → count = 4</div>
+                
+                <p><strong>Result: 4 islands</strong> (each isolated land cell forms its own island)</p>
+            </div>
+        </div>
+
+        <button class="collapsible">⚡ Edge Cases & Special Scenarios</button>
+        <div class="content">
+            <h3>Case 1: Empty Matrix</h3>
+            <div class="code-block"><span class="variable">matrix</span> = []
+<span class="variable">result</span> = <span class="number">0</span>  <span class="comment"># Handled by if not matrix check</span></div>
+
+            <h3>Case 2: All Water</h3>
+            <div class="matrix-grid matrix-3x3">
+                <div class="cell water">0</div>
+                <div class="cell water">0</div>
+                <div class="cell water">0</div>
+                <div class="cell water">0</div>
+                <div class="cell water">0</div>
+                <div class="cell water">0</div>
+                <div class="cell water">0</div>
+                <div class="cell water">0</div>
+                <div class="cell water">0</div>
+            </div>
+            <p><strong>Result: 0 islands</strong></p>
+
+            <h3>Case 3: All Land (One Giant Island)</h3>
+            <div class="matrix-grid matrix-3x3">
+                <div class="cell land">1</div>
+                <div class="cell land">1</div>
+                <div class="cell land">1</div>
+                <div class="cell land">1</div>
+                <div class="cell land">1</div>
+                <div class="cell land">1</div>
+                <div class="cell land">1</div>
+                <div class="cell land">1</div>
+                <div class="cell land">1</div>
+            </div>
+            <p><strong>Result: 1 island</strong> (all cells are connected)</p>
+
+            <h3>Case 4: Single Cell</h3>
+            <div class="code-block"><span class="variable">matrix</span> = [[<span class="number">1</span>]]  <span class="comment"># Result: 1</span>
+<span class="variable">matrix</span> = [[<span class="number">0</span>]]  <span class="comment"># Result: 0</span></div>
+        </div>
+
+        <button class="collapsible">📊 Complexity Analysis & Key Insights</button>
+        <div class="content">
+            <h3>Time & Space Complexity</h3>
+            <table class="complexity-table">
+                <tr>
+                    <th>Aspect</th>
+                    <th>Complexity</th>
+                    <th>Explanation</th>
+                </tr>
+                <tr>
+                    <td>Time Complexity</td>
+                    <td><span class="highlight">O(M × N)</span></td>
+                    <td>Each cell is visited at most twice: once in the main loop, once in DFS</td>
+                </tr>
+                <tr>
+                    <td>Space Complexity</td>
+                    <td><span class="highlight">O(M × N)</span></td>
+                    <td>Worst case: DFS recursion stack for a matrix that's all land</td>
+                </tr>
+                <tr>
+                    <td>Space (Modified Matrix)</td>
+                    <td><span class="highlight">O(1)</span></td>
+                    <td>If we're allowed to modify input matrix (using -1 for visited)</td>
+                </tr>
+            </table>
+
+            <h3>🧠 Key Insights</h3>
+            
+            <div class="step">
+                <div class="step-title">Why DFS Works Perfect Here</div>
+                <p>DFS naturally explores all connected components (islands) by following the "path" of connected land cells. Once we mark a cell as visited, we never count it again, ensuring each island is counted exactly once.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-title">Memory Optimization</div>
+                <p>By modifying the input matrix (changing 1s to -1s), we avoid using extra space for a visited array. This is acceptable since we're just counting islands, not preserving the original matrix.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-title">Alternative Approaches</div>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>BFS:</strong> Could use a queue instead of recursion</li>
+                    <li><strong>Union-Find:</strong> More complex but useful for dynamic connectivity</li>
+                    <li><strong>Iterative DFS:</strong> Using explicit stack to avoid recursion depth limits</li>
+                </ul>
+            </div>
+
+            <h3>🎯 Common Use Cases</h3>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li><strong>Geographic Analysis:</strong> Counting landmasses, lakes, or regions</li>
+                <li><strong>Image Processing:</strong> Connected component analysis</li>
+                <li><strong>Network Analysis:</strong> Finding disconnected subgraphs</li>
+                <li><strong>Game Development:</strong> Terrain analysis, flood fill algorithms</li>
+            </ul>
+        </div>
+
+        <button class="collapsible">🧪 Test Cases & Demonstrations</button>
+        <div class="content">
+            <h3>Test Implementation</h3>
+            <div class="code-block"><span class="comment"># Test cases for the Count Islands algorithm</span>
+
+<span class="keyword">def</span> <span class="function">test_count_islands</span>():
+    <span class="comment"># Test case 1: Given example</span>
+    <span class="variable">matrix1</span> = [
+        [<span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>],
+        [<span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>],
+        [<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>],
+        [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>]
+    ]
+    <span class="variable">result1</span> = <span class="function">count_islands</span>(<span class="variable">matrix1</span>)
+    <span class="function">print</span>(<span class="string">f"Test 1 - Expected: 2, Got: {result1}"</span>)
+    
+    <span class="comment"># Test case 2: Scattered islands</span>
+    <span class="variable">matrix2</span> = [
+        [<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>],
+        [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>],
+        [<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>]
+    ]
+    <span class="variable">result2</span> = <span class="function">count_islands</span>(<span class="variable">matrix2</span>)
+    <span class="function">print</span>(<span class="string">f"Test 2 - Expected: 4, Got: {result2}"</span>)
+    
+    <span class="comment"># Test case 3: No islands</span>
+    <span class="variable">matrix3</span> = [
+        [<span class="number">0</span>, <span class="number">0</span>],
+        [<span class="number">0</span>, <span class="number">0</span>]
+    ]
+    <span class="variable">result3</span> = <span class="function">count_islands</span>(<span class="variable">matrix3</span>)
+    <span class="function">print</span>(<span class="string">f"Test 3 - Expected: 0, Got: {result3}"</span>)
+    
+    <span class="comment"># Test case 4: Single large island</span>
+    <span class="variable">matrix4</span> = [
+        [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>],
+        [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>],
+        [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>]
+    ]
+    <span class="variable">result4</span> = <span class="function">count_islands</span>(<span class="variable">matrix4</span>)
+    <span class="function">print</span>(<span class="string">f"Test 4 - Expected: 1, Got: {result4}"</span>)
+
+<span class="comment"># Run tests</span>
+<span class="function">test_count_islands</span>()</div>
+
+            <h3>Expected Output</h3>
+            <div class="code-block"><span class="string">Test 1 - Expected: 2, Got: 2
+Test 2 - Expected: 4, Got: 4  
+Test 3 - Expected: 0, Got: 0
+Test 4 - Expected: 1, Got: 1</span></div>
+        </div>
+
+        <div class="section">
+            <h2>🎯 Summary</h2>
+            <p>The Count Islands algorithm efficiently identifies connected components in a binary matrix using DFS. It's a fundamental graph traversal problem with wide applications in computer science, from image processing to geographic analysis.</p>
+            
+            <p><strong>Key takeaways:</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>DFS naturally handles connected component detection</li>
+                <li>Modifying input matrix saves space (O(1) extra space)</li>
+                <li>Time complexity is optimal: O(M×N) - each cell visited at most twice</li>
+                <li>Handles all edge cases: empty matrix, all water, all land</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Make sections collapsible
+        const collapsibles = document.getElementsByClassName('collapsible');
+        
+        for (let i = 0; i < collapsibles.length; i++) {
+            collapsibles[i].addEventListener('click', function() {
+                this.classList.toggle('active');
+                const content = this.nextElementSibling;
+                content.classList.toggle('active');
+            });
+        }
+    </script>
+</body>
+</html>
