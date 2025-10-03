@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Infection - BFS Algorithm Explained</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #282c34;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            padding: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 300;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            background: #21252b;
+            border-radius: 8px;
+            padding: 30px;
+            border-left: 4px solid #61afef;
+        }
+
+        .section h2 {
+            color: #61afef;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h3 {
+            color: #98c379;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .section h4 {
+            color: #e5c07b;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .code-block {
+            background: #1e2127;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            border: 1px solid #3e4451;
+            white-space: pre-wrap;
+            line-height: 1.8;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .keyword {
+            color: #c678dd;
+            font-weight: bold;
+        }
+
+        .function {
+            color: #61afef;
+        }
+
+        .string {
+            color: #98c379;
+        }
+
+        .number {
+            color: #d19a66;
+        }
+
+        .comment {
+            color: #5c6370;
+            font-style: italic;
+        }
+
+        .variable {
+            color: #e06c75;
+        }
+
+        .operator {
+            color: #56b6c2;
+        }
+
+        .matrix-grid {
+            display: inline-grid;
+            gap: 2px;
+            background: #3e4451;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 15px 10px;
+        }
+
+        .matrix-cell {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.3em;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .cell-empty {
+            background: #21252b;
+            color: #5c6370;
+        }
+
+        .cell-uninfected {
+            background: #98c379;
+            color: #1e2127;
+        }
+
+        .cell-infected {
+            background: #e06c75;
+            color: white;
+        }
+
+        .cell-processing {
+            background: #e5c07b;
+            color: #1e2127;
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .arrow {
+            font-size: 2em;
+            color: #61afef;
+            margin: 0 15px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .step-container {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            gap: 10px;
+        }
+
+        .step-label {
+            background: #61afef;
+            color: #1e2127;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        .info-box {
+            background: #2c313a;
+            border-left: 4px solid #e5c07b;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .info-box strong {
+            color: #e5c07b;
+        }
+
+        .warning-box {
+            background: #2c2020;
+            border-left: 4px solid #e06c75;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .warning-box strong {
+            color: #e06c75;
+        }
+
+        .success-box {
+            background: #1f2c1f;
+            border-left: 4px solid #98c379;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .success-box strong {
+            color: #98c379;
+        }
+
+        .collapsible {
+            background: #3e4451;
+            color: white;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 1.1em;
+            border-radius: 6px;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .collapsible:hover {
+            background: #4e5461;
+        }
+
+        .collapsible:after {
+            content: '▼';
+            color: #61afef;
+            float: right;
+            margin-left: 5px;
+            transition: transform 0.3s ease;
+        }
+
+        .collapsible.active:after {
+            transform: rotate(-180deg);
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background: #21252b;
+            border-radius: 0 0 6px 6px;
+        }
+
+        .collapsible-content-inner {
+            padding: 20px;
+        }
+
+        .flowchart {
+            background: #1e2127;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .flow-node {
+            background: #3e4451;
+            border: 2px solid #61afef;
+            border-radius: 8px;
+            padding: 15px 25px;
+            margin: 15px auto;
+            max-width: 400px;
+            font-weight: 500;
+        }
+
+        .flow-decision {
+            background: #3e4451;
+            border: 2px solid #e5c07b;
+            border-radius: 8px;
+            padding: 15px 25px;
+            margin: 15px auto;
+            max-width: 400px;
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            padding: 25px;
+        }
+
+        .flow-arrow-down {
+            color: #61afef;
+            font-size: 2em;
+            margin: 10px 0;
+        }
+
+        .complexity-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #1e2127;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .complexity-table th {
+            background: #3e4451;
+            color: #61afef;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .complexity-table td {
+            padding: 15px;
+            border-bottom: 1px solid #3e4451;
+        }
+
+        .complexity-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin: 0 5px;
+        }
+
+        .badge-time {
+            background: #61afef;
+            color: #1e2127;
+        }
+
+        .badge-space {
+            background: #98c379;
+            color: #1e2127;
+        }
+
+        .badge-optimal {
+            background: #e5c07b;
+            color: #1e2127;
+        }
+
+        .queue-viz {
+            background: #1e2127;
+            border: 2px solid #c678dd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            display: inline-block;
+        }
+
+        .queue-label {
+            color: #c678dd;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .queue-items {
+            display: flex;
+            gap: 5px;
+        }
+
+        .queue-item {
+            background: #3e4451;
+            color: #e5c07b;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        .vars-table {
+            background: #1e2127;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            display: inline-block;
+            min-width: 300px;
+        }
+
+        .vars-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #3e4451;
+        }
+
+        .vars-row:last-child {
+            border-bottom: none;
+        }
+
+        .vars-label {
+            color: #e5c07b;
+            font-weight: bold;
+            font-family: monospace;
+        }
+
+        .vars-value {
+            color: #d19a66;
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        .highlight {
+            background: rgba(97, 175, 239, 0.2);
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #61afef;
+            font-weight: 600;
+        }
+
+        ul, ol {
+            margin-left: 25px;
+            margin-top: 15px;
+        }
+
+        li {
+            margin: 10px 0;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+            
+            .step-container {
+                flex-direction: column;
+            }
+            
+            .arrow {
+                transform: rotate(90deg);
+                margin: 10px 0;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🦠 Matrix Infection Algorithm</h1>
+            <div class="subtitle">BFS Level-Order Traversal | Time: O(m×n) | Space: O(m×n)</div>
+        </header>
+
+        <div class="content">
+            <!-- Problem Overview -->
+            <div class="section">
+                <h2>📋 Problem Overview</h2>
+                <p>Given a matrix where each cell can be:</p>
+                <ul>
+                    <li><strong>0</strong>: Empty (doesn't participate in infection)</li>
+                    <li><strong>1</strong>: Uninfected (healthy cell)</li>
+                    <li><strong>2</strong>: Infected (spreads infection)</li>
+                </ul>
+                
+                <div class="info-box">
+                    <strong>🎯 Goal:</strong> Determine the minimum number of seconds for ALL uninfected cells (1s) to become infected (2s). If impossible, return -1.
+                </div>
+
+                <div class="info-box">
+                    <strong>🔄 Rules:</strong> Every second, each infected cell (2) infects its 4-directionally adjacent uninfected neighbors (1s). The infection spreads simultaneously from all infected cells.
+                </div>
+
+                <h3>Visual Example:</h3>
+                <div class="step-container">
+                    <div>
+                        <div class="step-label">Second 0 (Initial)</div>
+                        <div class="matrix-grid" style="grid-template-columns: repeat(4, 60px);">
+                            <div class="matrix-cell cell-uninfected">1</div>
+                            <div class="matrix-cell cell-uninfected">1</div>
+                            <div class="matrix-cell cell-uninfected">1</div>
+                            <div class="matrix-cell cell-empty">0</div>
+                            <div class="matrix-cell cell-empty">0</div>
+                            <div class="matrix-cell cell-empty">0</div>
+                            <div class="matrix-cell cell-infected">2</div>
+                            <div class="matrix-cell cell-uninfected">1</div>
+                            <div class="matrix-cell cell-empty">0</div>
+                            <div class="matrix-cell cell-uninfected">1</div>
+                            <div class="matrix-cell cell-uninfected">1</div>
+                            <div class="matrix-cell cell-empty">0</div>
+                        </div>
+                    </div>
+                    <span class="arrow">→</span>
+                    <div>
+                        <div class="step-label">Second 3 (Final)</div>
+                        <div class="matrix-grid" style="grid-template-columns: repeat(4, 60px);">
+                            <div class="matrix-cell cell-infected">2</div>
+                            <div class="matrix-cell cell-infected">2</div>
+                            <div class="matrix-cell cell-infected">2</div>
+                            <div class="matrix-cell cell-empty">0</div>
+                            <div class="matrix-cell cell-empty">0</div>
+                            <div class="matrix-cell cell-empty">0</div>
+                            <div class="matrix-cell cell-infected">2</div>
+                            <div class="matrix-cell cell-infected">2</div>
+                            <div class="matrix-cell cell-empty">0</div>
+                            <div class="matrix-cell cell-infected">2</div>
+                            <div class="matrix-cell cell-infected">2</div>
+                            <div class="matrix-cell cell-empty">0</div>
+                        </div>
+                    </div>
+                </div>
+                <p style="text-align: center; margin-top: 10px;"><strong>Result: 3 seconds</strong></p>
+            </div>
+
+            <!-- Algorithm Explanation -->
+            <div class="section">
+                <h2>🧠 Algorithm Strategy: BFS (Breadth-First Search)</h2>
+                
+                <div class="info-box">
+                    <strong>💡 Key Insight:</strong> This is a <span class="highlight">multi-source BFS</span> problem. All infected cells (2s) spread infection simultaneously, level by level. Each level represents one second passing.
+                </div>
+
+                <h3>Why BFS?</h3>
+                <ul>
+                    <li><strong>Level-order traversal:</strong> BFS explores nodes level by level, which naturally maps to time progression (1 level = 1 second)</li>
+                    <li><strong>Simultaneous spreading:</strong> All infected cells at the same level infect their neighbors at the same time</li>
+                    <li><strong>Shortest path:</strong> BFS guarantees the minimum time to reach all cells</li>
+                </ul>
+
+                <h3>Algorithm Flow:</h3>
+                <div class="flowchart">
+                    <div class="flow-node">1. Initialize queue with ALL infected cells (2s)</div>
+                    <div class="flow-arrow-down">↓</div>
+                    <div class="flow-node">2. Count total uninfected cells (1s)</div>
+                    <div class="flow-arrow-down">↓</div>
+                    <div class="flow-node">3. Process queue level by level (BFS)</div>
+                    <div class="flow-arrow-down">↓</div>
+                    <div class="flow-node">4. Each level = 1 second passing</div>
+                    <div class="flow-arrow-down">↓</div>
+                    <div class="flow-node">5. Infect adjacent uninfected cells</div>
+                    <div class="flow-arrow-down">↓</div>
+                    <div class="flow-decision" style="display: flex; align-items: center; justify-content: center;">
+                        All cells infected?
+                    </div>
+                    <div class="flow-arrow-down">↓</div>
+                    <div class="flow-node">6. Return seconds (or -1 if impossible)</div>
+                </div>
+            </div>
+
+            <!-- Code Walkthrough -->
+            <div class="section">
+                <h2>💻 Code Implementation</h2>
+                
+                <div class="code-block"><span class="keyword">from</span> collections <span class="keyword">import</span> deque
+<span class="keyword">from</span> typing <span class="keyword">import</span> List
+
+
+<span class="keyword">def</span> <span class="function">matrix_infection</span>(matrix: List[List[<span class="keyword">int</span>]]) <span class="operator">-></span> <span class="keyword">int</span>:
+    <span class="comment"># Define 4 directions: up, down, left, right</span>
+    dirs <span class="operator">=</span> [(<span class="number">-1</span>, <span class="number">0</span>), (<span class="number">1</span>, <span class="number">0</span>), (<span class="number">0</span>, <span class="number">-1</span>), (<span class="number">0</span>, <span class="number">1</span>)]
+    
+    <span class="comment"># Initialize queue for BFS and counters</span>
+    queue <span class="operator">=</span> deque()
+    ones <span class="operator">=</span> <span class="number">0</span>           <span class="comment"># Count of uninfected cells</span>
+    seconds <span class="operator">=</span> <span class="number">0</span>       <span class="comment"># Time elapsed</span>
+    
+    <span class="comment"># Count uninfected cells and collect all infected cells</span>
+    <span class="keyword">for</span> r <span class="keyword">in</span> <span class="function">range</span>(<span class="function">len</span>(matrix)):
+        <span class="keyword">for</span> c <span class="keyword">in</span> <span class="function">range</span>(<span class="function">len</span>(matrix[<span class="number">0</span>])):
+            <span class="keyword">if</span> matrix[r][c] <span class="operator">==</span> <span class="number">1</span>:
+                ones <span class="operator">+=</span> <span class="number">1</span>
+            <span class="keyword">elif</span> matrix[r][c] <span class="operator">==</span> <span class="number">2</span>:
+                queue.<span class="function">append</span>((r, c))  <span class="comment"># Add to queue for level 0</span>
+    
+    <span class="comment"># BFS: Process queue level by level</span>
+    <span class="keyword">while</span> queue <span class="keyword">and</span> ones <span class="operator">></span> <span class="number">0</span>:
+        seconds <span class="operator">+=</span> <span class="number">1</span>  <span class="comment"># One second passes per level</span>
+        
+        <span class="comment"># Process all cells at current level</span>
+        <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="function">range</span>(<span class="function">len</span>(queue)):
+            r, c <span class="operator">=</span> queue.<span class="function">popleft</span>()
+            
+            <span class="comment"># Check all 4 adjacent cells</span>
+            <span class="keyword">for</span> d <span class="keyword">in</span> dirs:
+                next_r, next_c <span class="operator">=</span> r <span class="operator">+</span> d[<span class="number">0</span>], c <span class="operator">+</span> d[<span class="number">1</span>]
+                
+                <span class="comment"># If valid and uninfected, infect it</span>
+                <span class="keyword">if</span> <span class="function">is_within_bounds</span>(next_r, next_c, matrix) <span class="keyword">and</span> matrix[next_r][next_c] <span class="operator">==</span> <span class="number">1</span>:
+                    matrix[next_r][next_c] <span class="operator">=</span> <span class="number">2</span>
+                    ones <span class="operator">-=</span> <span class="number">1</span>
+                    queue.<span class="function">append</span>((next_r, next_c))  <span class="comment"># Add for next level</span>
+    
+    <span class="comment"># Return result: seconds if all infected, -1 otherwise</span>
+    <span class="keyword">return</span> seconds <span class="keyword">if</span> ones <span class="operator">==</span> <span class="number">0</span> <span class="keyword">else</span> <span class="number">-1</span>
+
+
+<span class="keyword">def</span> <span class="function">is_within_bounds</span>(r: <span class="keyword">int</span>, c: <span class="keyword">int</span>, matrix: List[List[<span class="keyword">int</span>]]) <span class="operator">-></span> <span class="keyword">bool</span>:
+    <span class="comment"># Check if position is within matrix boundaries</span>
+    <span class="keyword">return</span> <span class="number">0</span> <span class="operator"><=</span> r <span class="operator"><</span> <span class="function">len</span>(matrix) <span class="keyword">and</span> <span class="number">0</span> <span class="operator"><=</span> c <span class="operator"><</span> <span class="function">len</span>(matrix[<span class="number">0</span>])</div>
+            </div>
+
+            <!-- Example 1: Detailed Walkthrough -->
+            <div class="section">
+                <h2>🎯 Example 1: Standard Case - Detailed Walkthrough</h2>
+                
+                <div class="code-block">matrix <span class="operator">=</span> [
+    [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>],
+    [<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>],
+    [<span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>]
+]</div>
+
+                <button class="collapsible">Step 0: Initialization Phase</button>
+                <div class="collapsible-content">
+                    <div class="collapsible-content-inner">
+                        <h4>🔍 What happens:</h4>
+                        <ol>
+                            <li>Scan entire matrix to find infected cells (2s)</li>
+                            <li>Add all infected cells to queue</li>
+                            <li>Count total uninfected cells (1s)</li>
+                        </ol>
+
+                        <div class="step-container">
+                            <div>
+                                <div class="step-label">Initial Matrix</div>
+                                <div class="matrix-grid" style="grid-template-columns: repeat(4, 60px);">
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="vars-table">
+                            <div class="vars-row">
+                                <span class="vars-label">ones</span>
+                                <span class="vars-value">6</span>
+                            </div>
+                            <div class="vars-row">
+                                <span class="vars-label">seconds</span>
+                                <span class="vars-value">0</span>
+                            </div>
+                        </div>
+
+                        <div class="queue-viz">
+                            <div class="queue-label">Queue (Level 0):</div>
+                            <div class="queue-items">
+                                <div class="queue-item">(1, 2)</div>
+                            </div>
+                        </div>
+
+                        <div class="info-box">
+                            <strong>🔑 Key Point:</strong> We found 1 infected cell at position (1, 2) and 6 uninfected cells. The queue contains our starting points for BFS.
+                        </div>
+                    </div>
+                </div>
+
+                <button class="collapsible">Step 1: First Second Passes</button>
+                <div class="collapsible-content">
+                    <div class="collapsible-content-inner">
+                        <h4>🔍 What happens:</h4>
+                        <ol>
+                            <li>Increment seconds counter: <code>seconds = 1</code></li>
+                            <li>Process all cells in queue (1 cell at level 0)</li>
+                            <li>Cell (1,2) infects its 4 adjacent cells</li>
+                            <li>Check: up(0,2), down(2,2), left(1,1), right(1,3)</li>
+                        </ol>
+
+                        <div class="step-container">
+                            <div>
+                                <div class="step-label">Processing (1, 2)</div>
+                                <div class="matrix-grid" style="grid-template-columns: repeat(4, 60px);">
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-processing" title="Being infected!">1→2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-processing" title="Being infected!">1→2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-processing" title="Being infected!">1→2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                </div>
+                            </div>
+                            <span class="arrow">→</span>
+                            <div>
+                                <div class="step-label">After Second 1</div>
+                                <div class="matrix-grid" style="grid-template-columns: repeat(4, 60px);">
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="vars-table">
+                            <div class="vars-row">
+                                <span class="vars-label">ones</span>
+                                <span class="vars-value">3</span>
+                            </div>
+                            <div class="vars-row">
+                                <span class="vars-label">seconds</span>
+                                <span class="vars-value">1</span>
+                            </div>
+                        </div>
+
+                        <div class="queue-viz">
+                            <div class="queue-label">Queue (Level 1):</div>
+                            <div class="queue-items">
+                                <div class="queue-item">(0, 2)</div>
+                                <div class="queue-item">(1, 3)</div>
+                                <div class="queue-item">(2, 2)</div>
+                            </div>
+                        </div>
+
+                        <div class="success-box">
+                            <strong>✅ Result:</strong> 3 cells infected! Queue now has 3 newly infected cells for the next level. Uninfected count drops from 6 to 3.
+                        </div>
+                    </div>
+                </div>
+
+                <button class="collapsible">Step 2: Second Second Passes</button>
+                <div class="collapsible-content">
+                    <div class="collapsible-content-inner">
+                        <h4>🔍 What happens:</h4>
+                        <ol>
+                            <li>Increment seconds: <code>seconds = 2</code></li>
+                            <li>Process 3 cells from queue: (0,2), (1,3), (2,2)</li>
+                            <li>Each checks its 4 neighbors for uninfected cells</li>
+                        </ol>
+
+                        <div class="step-label">Processing Level 1 Cells</div>
+                        
+                        <h4>Cell (0, 2) infects:</h4>
+                        <ul>
+                            <li>Up: Out of bounds ❌</li>
+                            <li>Down: (1,2) already infected ❌</li>
+                            <li>Left: (0,1) is uninfected ✅ → Infect!</li>
+                            <li>Right: (0,3) is empty ❌</li>
+                        </ul>
+
+                        <h4>Cell (1, 3) infects:</h4>
+                        <ul>
+                            <li>All neighbors are 0 or out of bounds ❌</li>
+                        </ul>
+
+                        <h4>Cell (2, 2) infects:</h4>
+                        <ul>
+                            <li>Up: (1,2) already infected ❌</li>
+                            <li>Down: Out of bounds ❌</li>
+                            <li>Left: (2,1) is uninfected ✅ → Infect!</li>
+                            <li>Right: (2,3) is empty ❌</li>
+                        </ul>
+
+                        <div class="step-container">
+                            <div>
+                                <div class="step-label">Before</div>
+                                <div class="matrix-grid" style="grid-template-columns: repeat(4, 60px);">
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                </div>
+                            </div>
+                            <span class="arrow">→</span>
+                            <div>
+                                <div class="step-label">After Second 2</div>
+                                <div class="matrix-grid" style="grid-template-columns: repeat(4, 60px);">
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="vars-table">
+                            <div class="vars-row">
+                                <span class="vars-label">ones</span>
+                                <span class="vars-value">1</span>
+                            </div>
+                            <div class="vars-row">
+                                <span class="vars-label">seconds</span>
+                                <span class="vars-value">2</span>
+                            </div>
+                        </div>
+
+                        <div class="queue-viz">
+                            <div class="queue-label">Queue (Level 2):</div>
+                            <div class="queue-items">
+                                <div class="queue-item">(0, 1)</div>
+                                <div class="queue-item">(2, 1)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="collapsible">Step 3: Third Second Passes (Final)</button>
+                <div class="collapsible-content">
+                    <div class="collapsible-content-inner">
+                        <h4>🔍 What happens:</h4>
+                        <ol>
+                            <li>Increment seconds: <code>seconds = 3</code></li>
+                            <li>Process 2 cells: (0,1) and (2,1)</li>
+                            <li>Last uninfected cell gets infected!</li>
+                        </ol>
+
+                        <div class="step-label">Processing Final Level</div>
+                        
+                        <h4>Cell (0, 1) infects:</h4>
+                        <ul>
+                            <li>Up: Out of bounds ❌</li>
+                            <li>Down: (1,1) is empty ❌</li>
+                            <li>Left: (0,0) is uninfected ✅ → Infect!</li>
+                            <li>Right: (0,2) already infected ❌</li>
+                        </ul>
+
+                        <h4>Cell (2, 1) infects:</h4>
+                        <ul>
+                            <li>All neighbors already infected or empty ❌</li>
+                        </ul>
+
+                        <div class="step-container">
+                            <div>
+                                <div class="step-label">Before</div>
+                                <div class="matrix-grid" style="grid-template-columns: repeat(4, 60px);">
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                </div>
+                            </div>
+                            <span class="arrow">→</span>
+                            <div>
+                                <div class="step-label">After Second 3</div>
+                                <div class="matrix-grid" style="grid-template-columns: repeat(4, 60px);">
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="vars-table">
+                            <div class="vars-row">
+                                <span class="vars-label">ones</span>
+                                <span class="vars-value">0</span>
+                            </div>
+                            <div class="vars-row">
+                                <span class="vars-label">seconds</span>
+                                <span class="vars-value">3</span>
+                            </div>
+                        </div>
+
+                        <div class="queue-viz">
+                            <div class="queue-label">Queue:</div>
+                            <div class="queue-items">
+                                <div class="queue-item">(0, 0)</div>
+                            </div>
+                        </div>
+
+                        <div class="success-box">
+                            <strong>🎉 Complete!</strong> All uninfected cells are now infected. <code>ones = 0</code>, so we exit the while loop and return <code>seconds = 3</code>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Example 2: Multiple Initial Infections -->
+            <div class="section">
+                <h2>🎯 Example 2: Multiple Initial Infected Cells</h2>
+                
+                <div class="code-block">matrix <span class="operator">=</span> [
+    [<span class="number">2</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">2</span>],
+    [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>],
+    [<span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>]
+]</div>
+
+                <div class="info-box">
+                    <strong>🔥 Scenario:</strong> TWO infected cells at start - (0,0) and (0,3). They spread infection simultaneously from both locations.
+                </div>
+
+                <button class="collapsible">Initialization: Multiple Sources</button>
+                <div class="collapsible-content">
+                    <div class="collapsible-content-inner">
+                        <div class="step-container">
+                            <div>
+                                <div class="step-label">Initial State</div>
+                                <div class="matrix-grid" style="grid-template-columns: repeat(4, 60px);">
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="vars-table">
+                            <div class="vars-row">
+                                <span class="vars-label">ones</span>
+                                <span class="vars-value">7</span>
+                            </div>
+                            <div class="vars-row">
+                                <span class="vars-label">seconds</span>
+                                <span class="vars-value">0</span>
+                            </div>
+                        </div>
+
+                        <div class="queue-viz">
+                            <div class="queue-label">Queue (Level 0):</div>
+                            <div class="queue-items">
+                                <div class="queue-item">(0, 0)</div>
+                                <div class="queue-item">(0, 3)</div>
+                            </div>
+                        </div>
+
+                        <div class="info-box">
+                            <strong>💡 Key:</strong> Both infected cells start at the same level (Level 0), so they spread simultaneously in the first second.
+                        </div>
+                    </div>
+                </div>
+
+                <button class="collapsible">Second 1: Dual Spreading</button>
+                <div class="collapsible-content">
+                    <div class="collapsible-content-inner">
+                        <h4>From (0,0):</h4>
+                        <ul>
+                            <li>Right: (0,1) = 1 ✅ → Infect</li>
+                            <li>Down: (1,0) = 1 ✅ → Infect</li>
+                        </ul>
+
+                        <h4>From (0,3):</h4>
+                        <ul>
+                            <li>Left: (0,2) = 0 ❌</li>
+                            <li>Down: (1,3) = 1 ✅ → Infect</li>
+                        </ul>
+
+                        <div class="step-container">
+                            <div>
+                                <div class="step-label">Before</div>
+                                <div class="matrix-grid" style="grid-template-columns: repeat(4, 60px);">
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                </div>
+                            </div>
+                            <span class="arrow">→</span>
+                            <div>
+                                <div class="step-label">After Second 1</div>
+                                <div class="matrix-grid" style="grid-template-columns: repeat(4, 60px);">
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="vars-table">
+                            <div class="vars-row">
+                                <span class="vars-label">ones</span>
+                                <span class="vars-value">4</span>
+                            </div>
+                            <div class="vars-row">
+                                <span class="vars-label">seconds</span>
+                                <span class="vars-value">1</span>
+                            </div>
+                        </div>
+
+                        <div class="queue-viz">
+                            <div class="queue-label">Queue:</div>
+                            <div class="queue-items">
+                                <div class="queue-item">(0, 1)</div>
+                                <div class="queue-item">(1, 0)</div>
+                                <div class="queue-item">(1, 3)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="collapsible">Second 2: Convergence</button>
+                <div class="collapsible-content">
+                    <div class="collapsible-content-inner">
+                        <div class="step-container">
+                            <div>
+                                <div class="step-label">After Second 2</div>
+                                <div class="matrix-grid" style="grid-template-columns: repeat(4, 60px);">
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                </div>
+                            </div>
+                            <span class="arrow">→</span>
+                            <div>
+                                <div class="step-label">After Second 3</div>
+                                <div class="matrix-grid" style="grid-template-columns: repeat(4, 60px);">
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="success-box">
+                            <strong>✅ Result: 3 seconds</strong><br>
+                            Multiple infection sources work simultaneously, potentially reducing total time compared to single source.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Example 3: Impossible Case -->
+            <div class="section">
+                <h2>🎯 Example 3: Impossible Case (Return -1)</h2>
+                
+                <div class="code-block">matrix <span class="operator">=</span> [
+    [<span class="number">2</span>, <span class="number">0</span>, <span class="number">1</span>],
+    [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>],
+    [<span class="number">1</span>, <span class="number">0</span>, <span class="number">2</span>]
+]</div>
+
+                <div class="warning-box">
+                    <strong>⚠️ Problem:</strong> Some uninfected cells are completely isolated by empty cells (0s) - infection cannot reach them!
+                </div>
+
+                <button class="collapsible">Why It's Impossible</button>
+                <div class="collapsible-content">
+                    <div class="collapsible-content-inner">
+                        <div class="step-container">
+                            <div>
+                                <div class="step-label">Initial State</div>
+                                <div class="matrix-grid" style="grid-template-columns: repeat(3, 60px);">
+                                    <div class="matrix-cell cell-infected">2</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-uninfected">1</div>
+                                    <div class="matrix-cell cell-empty">0</div>
+                                    <div class="matrix-cell cell-infected">2</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="info-box">
+                            <strong>🔍 Analysis:</strong>
+                            <ul>
+                                <li>Cell (0,2) with value 1 is isolated - surrounded by empty cells and boundaries</li>
+                                <li>Cell (2,0) with value 1 is also isolated</li>
+                                <li>Infected cells at (0,0) and (2,2) cannot reach them</li>
+                                <li>Empty cells (0s) block the spread of infection</li>
+                            </ul>
+                        </div>
+
+                        <h4>After BFS completes:</h4>
+                        <div class="vars-table">
+                            <div class="vars-row">
+                                <span class="vars-label">ones</span>
+                                <span class="vars-value">2</span>
+                            </div>
+                            <div class="vars-row">
+                                <span class="vars-label">seconds</span>
+                                <span class="vars-value">0</span>
+                            </div>
+                            <div class="vars-row">
+                                <span class="vars-label">queue</span>
+                                <span class="vars-value">empty</span>
+                            </div>
+                        </div>
+
+                        <div class="warning-box">
+                            <strong>❌ Result: -1</strong><br>
+                            The while loop exits because queue is empty, but <code>ones > 0</code>, so we return -1 to indicate impossibility.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edge Cases -->
+            <div class="section">
+                <h2>🔍 Edge Cases & Special Scenarios</h2>
+
+                <button class="collapsible">Edge Case 1: All Already Infected</button>
+                <div class="collapsible-content">
+                    <div class="collapsible-content-inner">
+                        <div class="code-block">matrix <span class="operator">=</span> [[<span class="number">2</span>, <span class="number">2</span>], [<span class="number">2</span>, <span class="number">2</span>]]</div>
+                        
+                        <div class="vars-table">
+                            <div class="vars-row">
+                                <span class="vars-label">ones</span>
+                                <span class="vars-value">0</span>
+                            </div>
+                            <div class="vars-row">
+                                <span class="vars-label">Initial check</span>
+                                <span class="vars-value">ones == 0</span>
+                            </div>
+                        </div>
+
+                        <div class="success-box">
+                            <strong>✅ Result: 0 seconds</strong><br>
+                            The while loop condition <code>queue and ones > 0</code> is false immediately (ones = 0), so we return 0.
+                        </div>
+                    </div>
+                </div>
+
+                <button class="collapsible">Edge Case 2: No Infected Cells</button>
+                <div class="collapsible-content">
+                    <div class="collapsible-content-inner">
+                        <div class="code-block">matrix <span class="operator">=</span> [[<span class="number">1</span>, <span class="number">1</span>], [<span class="number">1</span>, <span class="number">1</span>]]</div>
+                        
+                        <div class="vars-table">
+                            <div class="vars-row">
+                                <span class="vars-label">ones</span>
+                                <span class="vars-value">4</span>
+                            </div>
+                            <div class="vars-row">
+                                <span class="vars-label">queue</span>
+                                <span class="vars-value">empty</span>
+                            </div>
+                        </div>
+
+                        <div class="warning-box">
+                            <strong>❌ Result: -1</strong><br>
+                            No infected cells to start with, so queue is empty. Loop never runs, and since ones > 0, we return -1.
+                        </div>
+                    </div>
+                </div>
+
+                <button class="collapsible">Edge Case 3: Only Empty Cells</button>
+                <div class="collapsible-content">
+                    <div class="collapsible-content-inner">
+                        <div class="code-block">matrix <span class="operator">=</span> [[<span class="number">0</span>, <span class="number">0</span>], [<span class="number">0</span>, <span class="number">0</span>]]</div>
+                        
+                        <div class="success-box">
+                            <strong>✅ Result: 0 seconds</strong><br>
+                            No uninfected cells to worry about. ones = 0, so we return 0.
+                        </div>
+                    </div>
+                </div>
+
+                <button class="collapsible">Edge Case 4: Single Cell</button>
+                <div class="collapsible-content">
+                    <div class="collapsible-content-inner">
+                        <div class="code-block"><span class="comment"># Case 4a: Single infected</span>
+matrix <span class="operator">=</span> [[<span class="number">2</span>]]  <span class="comment"># Returns 0</span>
+
+<span class="comment"># Case 4b: Single uninfected</span>
+matrix <span class="operator">=</span> [[<span class="number">1</span>]]  <span class="comment"># Returns -1</span>
+
+<span class="comment"># Case 4c: Single empty</span>
+matrix <span class="operator">=</span> [[<span class="number">0</span>]]  <span class="comment"># Returns 0</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Complexity Analysis -->
+            <div class="section">
+                <h2>📊 Complexity Analysis</h2>
+
+                <table class="complexity-table">
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Complexity</th>
+                        <th>Explanation</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Time Complexity</strong></td>
+                        <td><span class="badge badge-time">O(m × n)</span></td>
+                        <td>
+                            <ul style="margin: 10px 0;">
+                                <li><strong>Initialization:</strong> O(m×n) to scan matrix</li>
+                                <li><strong>BFS:</strong> Each cell visited at most once</li>
+                                <li><strong>Total:</strong> O(m×n) + O(m×n) = O(m×n)</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Space Complexity</strong></td>
+                        <td><span class="badge badge-space">O(m × n)</span></td>
+                        <td>
+                            <ul style="margin: 10px 0;">
+                                <li><strong>Queue:</strong> Worst case holds all cells O(m×n)</li>
+                                <li><strong>Directions array:</strong> O(1) constant</li>
+                                <li><strong>Variables:</strong> O(1) constant</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Optimality</strong></td>
+                        <td><span class="badge badge-optimal">Optimal</span></td>
+                        <td>
+                            Cannot do better than O(m×n) because we must examine every cell at least once to determine if infection is complete.
+                        </td>
+                    </tr>
+                </table>
+
+                <h3>Why This Approach?</h3>
+                <div class="info-box">
+                    <strong>BFS guarantees shortest path:</strong>
+                    <ul>
+                        <li>Level-order traversal naturally represents time progression</li>
+                        <li>All cells at distance d are processed at time d</li>
+                        <li>Cannot find faster solution with DFS (would need backtracking)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Key Insights -->
+            <div class="section">
+                <h2>💡 Key Insights & Patterns</h2>
+
+                <h3>1. Multi-Source BFS Pattern</h3>
+                <div class="info-box">
+                    <strong>Core Concept:</strong> Start BFS from multiple sources simultaneously by adding all starting points to the queue at Level 0.
+                    <br><br>
+                    <strong>Applications:</strong>
+                    <ul>
+                        <li>Rotting Oranges (LeetCode 994)</li>
+                        <li>Walls and Gates (LeetCode 286)</li>
+                        <li>01 Matrix (LeetCode 542)</li>
+                        <li>Shortest Path in Binary Matrix (LeetCode 1091)</li>
+                    </ul>
+                </div>
+
+                <h3>2. Level-Order Traversal for Time</h3>
+                <div class="info-box">
+                    <strong>Pattern:</strong> When time/distance matters, use BFS with level tracking:
+                    <div class="code-block"><span class="keyword">while</span> queue:
+    seconds <span class="operator">+=</span> <span class="number">1</span>  <span class="comment"># Increment for each level</span>
+    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="function">range</span>(<span class="function">len</span>(queue)):  <span class="comment"># Process entire level</span>
+        <span class="comment"># Process current node</span>
+        <span class="comment"># Add neighbors to queue for next level</span></div>
+                </div>
+
+                <h3>3. In-Place Modification</h3>
+                <div class="success-box">
+                    <strong>Space Optimization:</strong> We modify the matrix in-place (changing 1s to 2s) instead of using a separate visited set, saving O(m×n) space.
+                </div>
+
+                <h3>4. Early Termination</h3>
+                <div class="success-box">
+                    <strong>Efficiency:</strong> The condition <code>ones > 0</code> in the while loop ensures we stop as soon as all uninfected cells are infected, even if the queue isn't empty.
+                </div>
+
+                <h3>5. Impossibility Detection</h3>
+                <div class="warning-box">
+                    <strong>Check:</strong> After BFS completes, if <code>ones > 0</code>, some cells are unreachable. Return -1 to indicate impossibility.
+                </div>
+            </div>
+
+            <!-- Test Cases -->
+            <div class="section">
+                <h2>🧪 Test Cases & Verification</h2>
+
+                <div class="code-block"><span class="comment"># Test Case 1: Standard case</span>
+matrix1 <span class="operator">=</span> [
+    [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>],
+    [<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>],
+    [<span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>]
+]
+<span class="function">print</span>(matrix_infection(matrix1))  <span class="comment"># Output: 3</span>
+
+
+<span class="comment"># Test Case 2: Multiple sources</span>
+matrix2 <span class="operator">=</span> [
+    [<span class="number">2</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">2</span>],
+    [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>],
+    [<span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>]
+]
+<span class="function">print</span>(matrix_infection(matrix2))  <span class="comment"># Output: 3</span>
+
+
+<span class="comment"># Test Case 3: Impossible case</span>
+matrix3 <span class="operator">=</span> [
+    [<span class="number">2</span>, <span class="number">0</span>, <span class="number">1</span>],
+    [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>],
+    [<span class="number">1</span>, <span class="number">0</span>, <span class="number">2</span>]
+]
+<span class="function">print</span>(matrix_infection(matrix3))  <span class="comment"># Output: -1</span>
+
+
+<span class="comment"># Test Case 4: All infected</span>
+matrix4 <span class="operator">=</span> [[<span class="number">2</span>, <span class="number">2</span>], [<span class="number">2</span>, <span class="number">2</span>]]
+<span class="function">print</span>(matrix_infection(matrix4))  <span class="comment"># Output: 0</span>
+
+
+<span class="comment"># Test Case 5: No infected cells</span>
+matrix5 <span class="operator">=</span> [[<span class="number">1</span>, <span class="number">1</span>], [<span class="number">1</span>, <span class="number">1</span>]]
+<span class="function">print</span>(matrix_infection(matrix5))  <span class="comment"># Output: -1</span>
+
+
+<span class="comment"># Test Case 6: Single cell</span>
+matrix6 <span class="operator">=</span> [[<span class="number">2</span>]]
+<span class="function">print</span>(matrix_infection(matrix6))  <span class="comment"># Output: 0</span>
+
+
+<span class="comment"># Test Case 7: Large area</span>
+matrix7 <span class="operator">=</span> [
+    [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>],
+    [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>],
+    [<span class="number">1</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">1</span>],
+    [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>],
+    [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>]
+]
+<span class="function">print</span>(matrix_infection(matrix7))  <span class="comment"># Output: 4 (max distance from center)</span></div>
+
+                <h3>Expected Outputs:</h3>
+                <div class="success-box">
+                    <strong>✅ All test cases pass:</strong>
+                    <ul>
+                        <li>Test 1: 3 seconds (standard spreading)</li>
+                        <li>Test 2: 3 seconds (multi-source optimization)</li>
+                        <li>Test 3: -1 (impossible - isolated cells)</li>
+                        <li>Test 4: 0 seconds (already complete)</li>
+                        <li>Test 5: -1 (no infection source)</li>
+                        <li>Test 6: 0 seconds (trivial case)</li>
+                        <li>Test 7: 4 seconds (radial spreading from center)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="section">
+                <h2>🎓 Summary & Key Takeaways</h2>
+
+                <div class="info-box">
+                    <strong>Algorithm Essence:</strong>
+                    <ul>
+                        <li>Multi-source BFS for simultaneous spreading simulation</li>
+                        <li>Level-order traversal maps naturally to time progression</li>
+                        <li>Each BFS level represents one second passing</li>
+                        <li>In-place modification optimizes space usage</li>
+                    </ul>
+                </div>
+
+                <div class="success-box">
+                    <strong>When to Use This Pattern:</strong>
+                    <ul>
+                        <li>Shortest path/distance problems in grids</li>
+                        <li>Simultaneous spreading from multiple sources</li>
+                        <li>Time-based propagation simulations</li>
+                        <li>Finding minimum steps to reach all cells</li>
+                    </ul>
+                </div>
+
+                <div class="warning-box">
+                    <strong>Common Pitfalls to Avoid:</strong>
+                    <ul>
+                        <li>❌ Using DFS instead of BFS (won't give shortest time)</li>
+                        <li>❌ Forgetting to process entire level before incrementing time</li>
+                        <li>❌ Not checking bounds before accessing neighbors</li>
+                        <li>❌ Not handling the impossible case (returning -1)</li>
+                        <li>❌ Modifying queue size during iteration</li>
+                    </ul>
+                </div>
+
+                <h3>Related Problems:</h3>
+                <ul>
+                    <li><strong>LeetCode 994:</strong> Rotting Oranges (identical problem)</li>
+                    <li><strong>LeetCode 286:</strong> Walls and Gates</li>
+                    <li><strong>LeetCode 542:</strong> 01 Matrix</li>
+                    <li><strong>LeetCode 1091:</strong> Shortest Path in Binary Matrix</li>
+                    <li><strong>LeetCode 317:</strong> Shortest Distance from All Buildings</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Collapsible functionality
+        const collapsibles = document.getElementsByClassName("collapsible");
+        
+        for (let i = 0; i < collapsibles.length; i++) {
+            collapsibles[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                const content = this.nextElementSibling;
+                
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                } else {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                }
+            });
+        }
+
+        // Optional: Open first collapsible by default
+        if (collapsibles.length > 0) {
+            collapsibles[0].click();
+        }
+    </script>
+</body>
+</html>
