@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BFS Algorithm - Complete Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #282c34;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #61dafb;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(97, 218, 251, 0.3);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #98c379;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #e06c75;
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e06c75;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #d19a66;
+            font-size: 1.4em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            background: #21252b;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 4px solid #61dafb;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            border: 1px solid #3e4451;
+            white-space: pre-wrap;
+            line-height: 1.8;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .keyword {
+            color: #c678dd;
+            font-weight: bold;
+        }
+
+        .function {
+            color: #61dafb;
+        }
+
+        .string {
+            color: #98c379;
+        }
+
+        .comment {
+            color: #5c6370;
+            font-style: italic;
+        }
+
+        .number {
+            color: #d19a66;
+        }
+
+        .variable {
+            color: #e5c07b;
+        }
+
+        .operator {
+            color: #56b6c2;
+        }
+
+        .collapsible {
+            background: #3e4451;
+            color: #61dafb;
+            cursor: pointer;
+            padding: 15px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+
+        .collapsible:hover {
+            background: #4b5263;
+        }
+
+        .collapsible:after {
+            content: '\25BC';
+            float: right;
+            margin-left: 10px;
+        }
+
+        .collapsible.active:after {
+            content: '\25B2';
+        }
+
+        .content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background: #21252b;
+            padding: 0 20px;
+            border-radius: 0 0 6px 6px;
+        }
+
+        .content.active {
+            padding: 20px;
+            max-height: 5000px;
+        }
+
+        .visual-box {
+            background: #1e1e1e;
+            border: 2px solid #61dafb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .graph-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .node {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #3e4451;
+            color: #61dafb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            margin: 10px;
+            border: 3px solid #61dafb;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .node.visited {
+            background: #98c379;
+            border-color: #98c379;
+            color: #1e1e1e;
+        }
+
+        .node.current {
+            background: #e06c75;
+            border-color: #e06c75;
+            color: #ffffff;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .step-box {
+            background: #2c313a;
+            border-left: 4px solid #d19a66;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .step-title {
+            color: #d19a66;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .queue-display {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .queue-label {
+            color: #c678dd;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .queue-item {
+            background: #61dafb;
+            color: #1e1e1e;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .highlight-box {
+            background: #2c313a;
+            border: 2px solid #98c379;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .highlight-title {
+            color: #98c379;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .info-box {
+            background: #1e3a5f;
+            border-left: 4px solid #61dafb;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background: #5f3a1e;
+            border-left: 4px solid #d19a66;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .success-box {
+            background: #1e5f3a;
+            border-left: 4px solid #98c379;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #1e1e1e;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #3e4451;
+            color: #61dafb;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #3e4451;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: #2c313a;
+        }
+
+        .complexity-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        .time-complexity {
+            background: #e06c75;
+            color: #ffffff;
+        }
+
+        .space-complexity {
+            background: #61dafb;
+            color: #1e1e1e;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        .flowchart {
+            background: #1e1e1e;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .flow-box {
+            background: #3e4451;
+            border: 2px solid #61dafb;
+            padding: 15px 25px;
+            border-radius: 8px;
+            display: inline-block;
+            margin: 10px;
+            color: #e0e0e0;
+        }
+
+        .flow-arrow {
+            color: #d19a66;
+            font-size: 24px;
+            margin: 10px 0;
+        }
+
+        code {
+            background: #3e4451;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            color: #e5c07b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Breadth-First Search (BFS) Algorithm</h1>
+        <div class="subtitle">A Complete Guide with Visual Examples</div>
+
+        <!-- Introduction -->
+        <div class="section">
+            <h2>📚 What is BFS?</h2>
+            <p><strong>Breadth-First Search (BFS)</strong> is a graph/tree traversal algorithm that explores nodes level by level. It visits all neighbors at the current depth before moving to nodes at the next depth level.</p>
+            
+            <div class="highlight-box">
+                <div class="highlight-title">🎯 Key Characteristics</div>
+                <ul>
+                    <li><strong>Uses a Queue</strong>: FIFO (First In, First Out) data structure</li>
+                    <li><strong>Level-by-level exploration</strong>: Visits nodes in order of their distance from the start</li>
+                    <li><strong>Finds shortest path</strong>: In unweighted graphs, BFS finds the shortest path</li>
+                    <li><strong>Typically iterative</strong>: BFS is usually implemented with a loop, not recursion</li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <strong>⚠️ Important Note:</strong> You mentioned seeing BFS with recursion. BFS is <em>typically iterative</em> using a queue. <strong>DFS (Depth-First Search)</strong> is the algorithm commonly implemented recursively! I'll show you both BFS (iterative) and explain the difference from recursive DFS.
+            </div>
+        </div>
+
+        <!-- How BFS Works -->
+        <div class="section">
+            <h2>⚙️ How BFS Works</h2>
+            
+            <div class="flowchart">
+                <div class="flow-box">Start at root/source node</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-box">Add to queue & mark as visited</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-box">While queue is not empty</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-box">Dequeue front node</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-box">Process current node</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-box">Add unvisited neighbors to queue</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-box">Mark neighbors as visited</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-box">Repeat until queue is empty</div>
+            </div>
+
+            <h3>🔄 The Algorithm Steps:</h3>
+            <ol>
+                <li><strong>Initialize</strong>: Create a queue and a visited set. Add the starting node to both.</li>
+                <li><strong>Dequeue</strong>: Remove the front node from the queue.</li>
+                <li><strong>Process</strong>: Do something with the current node (print, store, etc.).</li>
+                <li><strong>Enqueue neighbors</strong>: For each unvisited neighbor, add it to the queue and mark as visited.</li>
+                <li><strong>Repeat</strong>: Continue until the queue is empty.</li>
+            </ol>
+        </div>
+
+        <!-- Python Implementation -->
+        <div class="section">
+            <h2>💻 Python Implementation</h2>
+            
+            <h3>Basic BFS for Graph Traversal</h3>
+            <div class="code-block"><span class="keyword">from</span> collections <span class="keyword">import</span> deque
+
+<span class="keyword">def</span> <span class="function">bfs</span>(graph, start):
+    <span class="comment"># Initialize queue with starting node</span>
+    queue = deque([start])
+    
+    <span class="comment"># Track visited nodes to avoid cycles</span>
+    visited = <span class="keyword">set</span>([start])
+    
+    <span class="comment"># Store the order of traversal</span>
+    result = []
+    
+    <span class="comment"># Process nodes until queue is empty</span>
+    <span class="keyword">while</span> queue:
+        <span class="comment"># Remove and get the front node</span>
+        node = queue.popleft()
+        
+        <span class="comment"># Process the current node</span>
+        result.append(node)
+        
+        <span class="comment"># Add all unvisited neighbors to queue</span>
+        <span class="keyword">for</span> neighbor <span class="keyword">in</span> graph[node]:
+            <span class="keyword">if</span> neighbor <span class="keyword">not in</span> visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+    
+    <span class="keyword">return</span> result</div>
+
+            <h3>BFS with Path Tracking</h3>
+            <div class="code-block"><span class="keyword">def</span> <span class="function">bfs_with_path</span>(graph, start, target):
+    <span class="comment"># Queue stores tuples of (node, path_to_node)</span>
+    queue = deque([(start, [start])])
+    visited = <span class="keyword">set</span>([start])
+    
+    <span class="keyword">while</span> queue:
+        node, path = queue.popleft()
+        
+        <span class="comment"># Check if we reached the target</span>
+        <span class="keyword">if</span> node == target:
+            <span class="keyword">return</span> path
+        
+        <span class="comment"># Explore neighbors</span>
+        <span class="keyword">for</span> neighbor <span class="keyword">in</span> graph[node]:
+            <span class="keyword">if</span> neighbor <span class="keyword">not in</span> visited:
+                visited.add(neighbor)
+                <span class="comment"># Add neighbor with updated path</span>
+                queue.append((neighbor, path + [neighbor]))
+    
+    <span class="comment"># No path found</span>
+    <span class="keyword">return</span> <span class="keyword">None</span></div>
+
+            <h3>BFS for Level-Order Traversal</h3>
+            <div class="code-block"><span class="keyword">def</span> <span class="function">bfs_by_level</span>(graph, start):
+    <span class="comment"># Returns nodes grouped by their level/distance from start</span>
+    queue = deque([(start, <span class="number">0</span>)])
+    visited = <span class="keyword">set</span>([start])
+    levels = {}
+    
+    <span class="keyword">while</span> queue:
+        node, level = queue.popleft()
+        
+        <span class="comment"># Group nodes by level</span>
+        <span class="keyword">if</span> level <span class="keyword">not in</span> levels:
+            levels[level] = []
+        levels[level].append(node)
+        
+        <span class="comment"># Add neighbors at next level</span>
+        <span class="keyword">for</span> neighbor <span class="keyword">in</span> graph[node]:
+            <span class="keyword">if</span> neighbor <span class="keyword">not in</span> visited:
+                visited.add(neighbor)
+                queue.append((neighbor, level + <span class="number">1</span>))
+    
+    <span class="keyword">return</span> levels</div>
+        </div>
+
+        <!-- Step-by-Step Example 1 -->
+        <div class="section">
+            <h2>🎯 Example 1: Social Network Graph</h2>
+            <p>Let's trace through BFS on a friend network where we want to find all connections starting from "Alice".</p>
+
+            <div class="visual-box">
+                <h3>Graph Structure</h3>
+                <pre style="text-align: left; color: #98c379; font-family: monospace;">
+    Alice
+    /  |  \
+   Bob  Carol  David
+   |      |      |
+  Eve    Frank  Grace
+         |
+        Henry
+                </pre>
+                <p style="margin-top: 15px; color: #d19a66;">Edges represent friendships (bidirectional)</p>
+            </div>
+
+            <h3>Graph Representation in Python:</h3>
+            <div class="code-block"><span class="comment"># Adjacency list representation</span>
+graph = {
+    <span class="string">'Alice'</span>: [<span class="string">'Bob'</span>, <span class="string">'Carol'</span>, <span class="string">'David'</span>],
+    <span class="string">'Bob'</span>: [<span class="string">'Alice'</span>, <span class="string">'Eve'</span>],
+    <span class="string">'Carol'</span>: [<span class="string">'Alice'</span>, <span class="string">'Frank'</span>],
+    <span class="string">'David'</span>: [<span class="string">'Alice'</span>, <span class="string">'Grace'</span>],
+    <span class="string">'Eve'</span>: [<span class="string">'Bob'</span>],
+    <span class="string">'Frank'</span>: [<span class="string">'Carol'</span>, <span class="string">'Henry'</span>],
+    <span class="string">'Grace'</span>: [<span class="string">'David'</span>],
+    <span class="string">'Henry'</span>: [<span class="string">'Frank'</span>]
+}
+
+<span class="comment"># Run BFS starting from Alice</span>
+result = bfs(graph, <span class="string">'Alice'</span>)</div>
+
+            <button class="collapsible">Click to see step-by-step trace</button>
+            <div class="content">
+                <h3>Step-by-Step Execution:</h3>
+
+                <div class="step-box">
+                    <div class="step-title">Step 0: Initialize</div>
+                    <div class="queue-display">
+                        <span class="queue-label">Queue:</span>
+                        <span class="queue-item">Alice</span>
+                    </div>
+                    <div class="queue-display">
+                        <span class="queue-label">Visited:</span>
+                        <span class="queue-item">Alice</span>
+                    </div>
+                    <div class="queue-display">
+                        <span class="queue-label">Result:</span>
+                        <span style="color: #5c6370;">[]</span>
+                    </div>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Step 1: Process Alice</div>
+                    <p><strong>Dequeue:</strong> Alice</p>
+                    <p><strong>Action:</strong> Add Alice to result, check neighbors [Bob, Carol, David]</p>
+                    <p><strong>Add to queue:</strong> Bob, Carol, David (none visited yet)</p>
+                    <div class="queue-display">
+                        <span class="queue-label">Queue:</span>
+                        <span class="queue-item">Bob</span>
+                        <span class="queue-item">Carol</span>
+                        <span class="queue-item">David</span>
+                    </div>
+                    <div class="queue-display">
+                        <span class="queue-label">Visited:</span>
+                        <span class="queue-item">Alice</span>
+                        <span class="queue-item">Bob</span>
+                        <span class="queue-item">Carol</span>
+                        <span class="queue-item">David</span>
+                    </div>
+                    <div class="queue-display">
+                        <span class="queue-label">Result:</span>
+                        <span class="queue-item">Alice</span>
+                    </div>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Step 2: Process Bob</div>
+                    <p><strong>Dequeue:</strong> Bob</p>
+                    <p><strong>Action:</strong> Add Bob to result, check neighbors [Alice, Eve]</p>
+                    <p><strong>Add to queue:</strong> Eve (Alice already visited)</p>
+                    <div class="queue-display">
+                        <span class="queue-label">Queue:</span>
+                        <span class="queue-item">Carol</span>
+                        <span class="queue-item">David</span>
+                        <span class="queue-item">Eve</span>
+                    </div>
+                    <div class="queue-display">
+                        <span class="queue-label">Visited:</span>
+                        <span class="queue-item">Alice</span>
+                        <span class="queue-item">Bob</span>
+                        <span class="queue-item">Carol</span>
+                        <span class="queue-item">David</span>
+                        <span class="queue-item">Eve</span>
+                    </div>
+                    <div class="queue-display">
+                        <span class="queue-label">Result:</span>
+                        <span class="queue-item">Alice</span>
+                        <span class="queue-item">Bob</span>
+                    </div>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Step 3: Process Carol</div>
+                    <p><strong>Dequeue:</strong> Carol</p>
+                    <p><strong>Action:</strong> Add Carol to result, check neighbors [Alice, Frank]</p>
+                    <p><strong>Add to queue:</strong> Frank (Alice already visited)</p>
+                    <div class="queue-display">
+                        <span class="queue-label">Queue:</span>
+                        <span class="queue-item">David</span>
+                        <span class="queue-item">Eve</span>
+                        <span class="queue-item">Frank</span>
+                    </div>
+                    <div class="queue-display">
+                        <span class="queue-label">Visited:</span>
+                        <span class="queue-item">Alice</span>
+                        <span class="queue-item">Bob</span>
+                        <span class="queue-item">Carol</span>
+                        <span class="queue-item">David</span>
+                        <span class="queue-item">Eve</span>
+                        <span class="queue-item">Frank</span>
+                    </div>
+                    <div class="queue-display">
+                        <span class="queue-label">Result:</span>
+                        <span class="queue-item">Alice</span>
+                        <span class="queue-item">Bob</span>
+                        <span class="queue-item">Carol</span>
+                    </div>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Step 4: Process David</div>
+                    <p><strong>Dequeue:</strong> David</p>
+                    <p><strong>Action:</strong> Add David to result, check neighbors [Alice, Grace]</p>
+                    <p><strong>Add to queue:</strong> Grace (Alice already visited)</p>
+                    <div class="queue-display">
+                        <span class="queue-label">Queue:</span>
+                        <span class="queue-item">Eve</span>
+                        <span class="queue-item">Frank</span>
+                        <span class="queue-item">Grace</span>
+                    </div>
+                    <div class="queue-display">
+                        <span class="queue-label">Visited:</span>
+                        <span class="queue-item">Alice</span>
+                        <span class="queue-item">Bob</span>
+                        <span class="queue-item">Carol</span>
+                        <span class="queue-item">David</span>
+                        <span class="queue-item">Eve</span>
+                        <span class="queue-item">Frank</span>
+                        <span class="queue-item">Grace</span>
+                    </div>
+                    <div class="queue-display">
+                        <span class="queue-label">Result:</span>
+                        <span class="queue-item">Alice</span>
+                        <span class="queue-item">Bob</span>
+                        <span class="queue-item">Carol</span>
+                        <span class="queue-item">David</span>
+                    </div>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Step 5: Process Eve</div>
+                    <p><strong>Dequeue:</strong> Eve</p>
+                    <p><strong>Action:</strong> Add Eve to result, check neighbors [Bob]</p>
+                    <p><strong>Add to queue:</strong> None (Bob already visited)</p>
+                    <div class="queue-display">
+                        <span class="queue-label">Queue:</span>
+                        <span class="queue-item">Frank</span>
+                        <span class="queue-item">Grace</span>
+                    </div>
+                    <div class="queue-display">
+                        <span class="queue-label">Result:</span>
+                        <span class="queue-item">Alice</span>
+                        <span class="queue-item">Bob</span>
+                        <span class="queue-item">Carol</span>
+                        <span class="queue-item">David</span>
+                        <span class="queue-item">Eve</span>
+                    </div>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Step 6: Process Frank</div>
+                    <p><strong>Dequeue:</strong> Frank</p>
+                    <p><strong>Action:</strong> Add Frank to result, check neighbors [Carol, Henry]</p>
+                    <p><strong>Add to queue:</strong> Henry (Carol already visited)</p>
+                    <div class="queue-display">
+                        <span class="queue-label">Queue:</span>
+                        <span class="queue-item">Grace</span>
+                        <span class="queue-item">Henry</span>
+                    </div>
+                    <div class="queue-display">
+                        <span class="queue-label">Result:</span>
+                        <span class="queue-item">Alice</span>
+                        <span class="queue-item">Bob</span>
+                        <span class="queue-item">Carol</span>
+                        <span class="queue-item">David</span>
+                        <span class="queue-item">Eve</span>
+                        <span class="queue-item">Frank</span>
+                    </div>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Step 7: Process Grace</div>
+                    <p><strong>Dequeue:</strong> Grace</p>
+                    <p><strong>Action:</strong> Add Grace to result, check neighbors [David]</p>
+                    <p><strong>Add to queue:</strong> None (David already visited)</p>
+                    <div class="queue-display">
+                        <span class="queue-label">Queue:</span>
+                        <span class="queue-item">Henry</span>
+                    </div>
+                    <div class="queue-display">
+                        <span class="queue-label">Result:</span>
+                        <span class="queue-item">Alice</span>
+                        <span class="queue-item">Bob</span>
+                        <span class="queue-item">Carol</span>
+                        <span class="queue-item">David</span>
+                        <span class="queue-item">Eve</span>
+                        <span class="queue-item">Frank</span>
+                        <span class="queue-item">Grace</span>
+                    </div>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Step 8: Process Henry</div>
+                    <p><strong>Dequeue:</strong> Henry</p>
+                    <p><strong>Action:</strong> Add Henry to result, check neighbors [Frank]</p>
+                    <p><strong>Add to queue:</strong> None (Frank already visited)</p>
+                    <div class="queue-display">
+                        <span class="queue-label">Queue:</span>
+                        <span style="color: #5c6370;">[empty]</span>
+                    </div>
+                    <div class="queue-display">
+                        <span class="queue-label">Result:</span>
+                        <span class="queue-item">Alice</span>
+                        <span class="queue-item">Bob</span>
+                        <span class="queue-item">Carol</span>
+                        <span class="queue-item">David</span>
+                        <span class="queue-item">Eve</span>
+                        <span class="queue-item">Frank</span>
+                        <span class="queue-item">Grace</span>
+                        <span class="queue-item">Henry</span>
+                    </div>
+                </div>
+
+                <div class="success-box">
+                    <strong>✅ BFS Complete!</strong><br>
+                    <strong>Final Result:</strong> ['Alice', 'Bob', 'Carol', 'David', 'Eve', 'Frank', 'Grace', 'Henry']<br>
+                    <strong>Notice:</strong> Nodes are visited level by level - all direct friends before friends-of-friends!
+                </div>
+            </div>
+        </div>
+
+        <!-- Example 2: Finding Shortest Path -->
+        <div class="section">
+            <h2>🎯 Example 2: Finding Shortest Path</h2>
+            <p>Let's use BFS to find the shortest path between two nodes in a maze/grid.</p>
+
+            <div class="visual-box">
+                <h3>Maze Grid (0 = walkable, 1 = wall)</h3>
+                <pre style="text-align: left; color: #98c379; font-family: monospace;">
+    0   1   2   3   4
+0   S   0   0   1   0
+1   0   1   0   1   0
+2   0   0   0   0   0
+3   1   1   1   0   1
+4   0   0   0   0   E
+
+S = Start (0,0)
+E = End (4,4)
+                </pre>
+            </div>
+
+            <h3>BFS for Shortest Path in Grid:</h3>
+            <div class="code-block"><span class="keyword">from</span> collections <span class="keyword">import</span> deque
+
+<span class="keyword">def</span> <span class="function">bfs_shortest_path</span>(grid, start, end):
+    <span class="comment"># Dimensions of the grid</span>
+    rows = <span class="keyword">len</span>(grid)
+    cols = <span class="keyword">len</span>(grid[<span class="number">0</span>])
+    
+    <span class="comment"># Directions: up, down, left, right</span>
+    directions = [(-<span class="number">1</span>, <span class="number">0</span>), (<span class="number">1</span>, <span class="number">0</span>), (<span class="number">0</span>, -<span class="number">1</span>), (<span class="number">0</span>, <span class="number">1</span>)]
+    
+    <span class="comment"># Queue stores (row, col, path)</span>
+    queue = deque([(start[<span class="number">0</span>], start[<span class="number">1</span>], [start])])
+    visited = <span class="keyword">set</span>([start])
+    
+    <span class="keyword">while</span> queue:
+        row, col, path = queue.popleft()
+        
+        <span class="comment"># Check if we reached the end</span>
+        <span class="keyword">if</span> (row, col) == end:
+            <span class="keyword">return</span> path
+        
+        <span class="comment"># Explore all 4 directions</span>
+        <span class="keyword">for</span> dr, dc <span class="keyword">in</span> directions:
+            new_row = row + dr
+            new_col = col + dc
+            
+            <span class="comment"># Check if the new position is valid</span>
+            <span class="keyword">if</span> (<span class="number">0</span> <= new_row < rows <span class="keyword">and</span> 
+                <span class="number">0</span> <= new_col < cols <span class="keyword">and</span>
+                grid[new_row][new_col] == <span class="number">0</span> <span class="keyword">and</span>
+                (new_row, new_col) <span class="keyword">not in</span> visited):
+                
+                visited.add((new_row, new_col))
+                queue.append((new_row, new_col, path + [(new_row, new_col)]))
+    
+    <span class="comment"># No path found</span>
+    <span class="keyword">return</span> <span class="keyword">None</span>
+
+<span class="comment"># Test the maze</span>
+maze = [
+    [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>],
+    [<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>],
+    [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>],
+    [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>],
+    [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]
+]
+
+path = bfs_shortest_path(maze, (<span class="number">0</span>, <span class="number">0</span>), (<span class="number">4</span>, <span class="number">4</span>))
+<span class="keyword">print</span>(<span class="string">f"Shortest path length: </span>{<span class="keyword">len</span>(path)}<span class="string">"</span>)
+<span class="keyword">print</span>(<span class="string">f"Path: </span>{path}<span class="string">"</span>)</div>
+
+            <button class="collapsible">Click to see detailed trace</button>
+            <div class="content">
+                <h3>First Few Steps:</h3>
+
+                <div class="step-box">
+                    <div class="step-title">Step 1: Start at (0,0)</div>
+                    <p><strong>Current Position:</strong> (0, 0)</p>
+                    <p><strong>Check neighbors:</strong> Down (1,0) and Right (0,1)</p>
+                    <p><strong>Both are walkable (0), add to queue</strong></p>
+                    <div class="queue-display">
+                        <span class="queue-label">Queue:</span>
+                        <span class="queue-item">(1,0)</span>
+                        <span class="queue-item">(0,1)</span>
+                    </div>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Step 2: Process (1,0)</div>
+                    <p><strong>Current Position:</strong> (1, 0)</p>
+                    <p><strong>Path so far:</strong> [(0,0), (1,0)]</p>
+                    <p><strong>Check neighbors:</strong> Down (2,0) is walkable</p>
+                    <div class="queue-display">
+                        <span class="queue-label">Queue:</span>
+                        <span class="queue-item">(0,1)</span>
+                        <span class="queue-item">(2,0)</span>
+                    </div>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Step 3: Process (0,1)</div>
+                    <p><strong>Current Position:</strong> (0, 1)</p>
+                    <p><strong>Path so far:</strong> [(0,0), (0,1)]</p>
+                    <p><strong>Check neighbors:</strong> Right (0,2) is walkable</p>
+                    <div class="queue-display">
+                        <span class="queue-label">Queue:</span>
+                        <span class="queue-item">(2,0)</span>
+                        <span class="queue-item">(0,2)</span>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <strong>💡 Key Insight:</strong> BFS explores all positions at distance 1, then distance 2, then distance 3, etc. This guarantees we find the <strong>shortest path</strong> first!
+                </div>
+
+                <div class="success-box">
+                    <strong>✅ Final Result:</strong><br>
+                    <strong>Shortest Path:</strong> [(0,0), (1,0), (2,0), (2,1), (2,2), (2,3), (1,2), (0,2), (3,3), (4,3), (4,4)]<br>
+                    <strong>Path Length:</strong> 11 steps<br>
+                    <strong>Why it's shortest:</strong> BFS guarantees the first path found is the shortest!
+                </div>
+            </div>
+        </div>
+
+        <!-- Example 3: Word Ladder -->
+        <div class="section">
+            <h2>🎯 Example 3: Word Ladder Problem</h2>
+            <p>Transform one word into another by changing one letter at a time. Each intermediate word must be valid.</p>
+
+            <div class="highlight-box">
+                <div class="highlight-title">Problem:</div>
+                <p>Transform "HIT" to "COG" changing one letter at a time.</p>
+                <p><strong>Word list:</strong> ["HOT", "DOT", "DOG", "LOT", "LOG", "COG"]</p>
+                <p><strong>Expected path:</strong> HIT → HOT → DOT → DOG → COG</p>
+            </div>
+
+            <div class="code-block"><span class="keyword">from</span> collections <span class="keyword">import</span> deque
+
+<span class="keyword">def</span> <span class="function">word_ladder</span>(start, end, word_list):
+    <span class="comment"># Add end word if not in list</span>
+    <span class="keyword">if</span> end <span class="keyword">not in</span> word_list:
+        <span class="keyword">return</span> <span class="number">0</span>
+    
+    <span class="comment"># Convert to set for O(1) lookup</span>
+    word_set = <span class="keyword">set</span>(word_list)
+    
+    <span class="comment"># Queue stores (current_word, steps)</span>
+    queue = deque([(start, <span class="number">1</span>)])
+    visited = <span class="keyword">set</span>([start])
+    
+    <span class="keyword">while</span> queue:
+        word, steps = queue.popleft()
+        
+        <span class="comment"># Try changing each character</span>
+        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="keyword">range</span>(<span class="keyword">len</span>(word)):
+            <span class="comment"># Try all 26 letters</span>
+            <span class="keyword">for</span> c <span class="keyword">in</span> <span class="string">'abcdefghijklmnopqrstuvwxyz'</span>:
+                <span class="comment"># Create new word with one letter changed</span>
+                new_word = word[:i] + c + word[i+<span class="number">1</span>:]
+                
+                <span class="comment"># Check if we reached the end</span>
+                <span class="keyword">if</span> new_word == end:
+                    <span class="keyword">return</span> steps + <span class="number">1</span>
+                
+                <span class="comment"># Check if valid and not visited</span>
+                <span class="keyword">if</span> new_word <span class="keyword">in</span> word_set <span class="keyword">and</span> new_word <span class="keyword">not in</span> visited:
+                    visited.add(new_word)
+                    queue.append((new_word, steps + <span class="number">1</span>))
+    
+    <span class="comment"># No transformation possible</span>
+    <span class="keyword">return</span> <span class="number">0</span>
+
+<span class="comment"># Test</span>
+words = [<span class="string">"hot"</span>, <span class="string">"dot"</span>, <span class="string">"dog"</span>, <span class="string">"lot"</span>, <span class="string">"log"</span>, <span class="string">"cog"</span>]
+result = word_ladder(<span class="string">"hit"</span>, <span class="string">"cog"</span>, words)
+<span class="keyword">print</span>(<span class="string">f"Minimum transformations: </span>{result}<span class="string">"</span>)</div>
+
+            <button class="collapsible">Click to see transformation steps</button>
+            <div class="content">
+                <div class="step-box">
+                    <div class="step-title">Step 1: Start with "HIT"</div>
+                    <p>Try changing each letter to find valid words:</p>
+                    <ul>
+                        <li>Change H → A-Z: "AIT", "BIT", ..., "HOT" ✓ (found!)</li>
+                        <li>"HOT" is in word list, add to queue</li>
+                    </ul>
+                    <div class="queue-display">
+                        <span class="queue-label">Queue:</span>
+                        <span class="queue-item">HOT (steps: 2)</span>
+                    </div>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Step 2: Process "HOT"</div>
+                    <p>Try all one-letter changes:</p>
+                    <ul>
+                        <li>"DOT" ✓ (in word list)</li>
+                        <li>"LOT" ✓ (in word list)</li>
+                    </ul>
+                    <div class="queue-display">
+                        <span class="queue-label">Queue:</span>
+                        <span class="queue-item">DOT (steps: 3)</span>
+                        <span class="queue-item">LOT (steps: 3)</span>
+                    </div>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Step 3: Process "DOT"</div>
+                    <p>Try all one-letter changes:</p>
+                    <ul>
+                        <li>"DOG" ✓ (in word list)</li>
+                    </ul>
+                    <div class="queue-display">
+                        <span class="queue-label">Queue:</span>
+                        <span class="queue-item">LOT (steps: 3)</span>
+                        <span class="queue-item">DOG (steps: 4)</span>
+                    </div>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Step 4: Process "DOG"</div>
+                    <p>Try all one-letter changes:</p>
+                    <ul>
+                        <li>"COG" ✓ (target found!)</li>
+                    </ul>
+                    <div class="success-box">
+                        <strong>✅ Found!</strong><br>
+                        <strong>Transformation:</strong> HIT → HOT → DOT → DOG → COG<br>
+                        <strong>Steps:</strong> 5
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BFS vs DFS -->
+        <div class="section">
+            <h2>🔄 BFS vs DFS (and Why BFS is Iterative)</h2>
+
+            <div class="highlight-box">
+                <div class="highlight-title">The Key Difference</div>
+                <table>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>BFS (Breadth-First)</th>
+                        <th>DFS (Depth-First)</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Data Structure</strong></td>
+                        <td>Queue (FIFO)</td>
+                        <td>Stack (LIFO) or Recursion</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Implementation</strong></td>
+                        <td>Iterative (with queue)</td>
+                        <td>Recursive or Iterative</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Exploration Order</strong></td>
+                        <td>Level by level (breadth)</td>
+                        <td>Deep first, then backtrack (depth)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Memory Usage</strong></td>
+                        <td>O(width of tree)</td>
+                        <td>O(height of tree)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Shortest Path</strong></td>
+                        <td>✅ Guarantees shortest</td>
+                        <td>❌ May not be shortest</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Use Cases</strong></td>
+                        <td>Shortest path, level-order</td>
+                        <td>Topological sort, cycle detection</td>
+                    </tr>
+                </table>
+            </div>
+
+            <h3>Why BFS Uses a Queue (Not Recursion)</h3>
+            <div class="info-box">
+                <p><strong>BFS explores level by level</strong>, which naturally fits a queue:</p>
+                <ul>
+                    <li>Add all level 1 nodes to queue</li>
+                    <li>Process them (removing from front)</li>
+                    <li>Add all their children (level 2) to back of queue</li>
+                    <li>Continue...</li>
+                </ul>
+                <p><strong>Recursion uses a stack</strong> (the call stack), which naturally explores depth-first, not breadth-first!</p>
+            </div>
+
+            <h3>DFS (Recursive) for Comparison:</h3>
+            <div class="code-block"><span class="keyword">def</span> <span class="function">dfs_recursive</span>(graph, node, visited=<span class="keyword">None</span>):
+    <span class="comment"># DFS naturally uses recursion (stack)</span>
+    <span class="keyword">if</span> visited <span class="keyword">is</span> <span class="keyword">None</span>:
+        visited = <span class="keyword">set</span>()
+    
+    <span class="comment"># Mark current node as visited</span>
+    visited.add(node)
+    <span class="keyword">print</span>(node, end=<span class="string">' '</span>)
+    
+    <span class="comment"># Recursively visit all unvisited neighbors</span>
+    <span class="keyword">for</span> neighbor <span class="keyword">in</span> graph[node]:
+        <span class="keyword">if</span> neighbor <span class="keyword">not in</span> visited:
+            dfs_recursive(graph, neighbor, visited)
+    
+    <span class="keyword">return</span> visited</div>
+
+            <div class="visual-box">
+                <h3>Visual Comparison</h3>
+                <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 250px; margin: 10px;">
+                        <h4 style="color: #61dafb;">BFS Order:</h4>
+                        <pre style="text-align: left; color: #98c379;">
+Level 0:     A
+            / \
+Level 1:   B   C
+          /|   |\
+Level 2: D E   F G
+
+Order: A → B → C → D → E → F → G
+                        </pre>
+                    </div>
+                    <div style="flex: 1; min-width: 250px; margin: 10px;">
+                        <h4 style="color: #e06c75;">DFS Order:</h4>
+                        <pre style="text-align: left; color: #98c379;">
+          A (1)
+         / \
+    (2) B   C (6)
+       /|   |\
+  (3) D E(4)F(7)G(8)
+
+Order: A → B → D → E → C → F → G
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Complexity Analysis -->
+        <div class="section">
+            <h2>📊 Time & Space Complexity</h2>
+
+            <div class="highlight-box">
+                <div class="highlight-title">Complexity Analysis</div>
+                
+                <h3>For a Graph with V vertices and E edges:</h3>
+                <ul>
+                    <li>
+                        <span class="complexity-badge time-complexity">Time: O(V + E)</span>
+                        <p style="margin-top: 10px;">We visit each vertex once and explore each edge once</p>
+                    </li>
+                    <li style="margin-top: 20px;">
+                        <span class="complexity-badge space-complexity">Space: O(V)</span>
+                        <p style="margin-top: 10px;">Queue can hold up to V vertices, visited set also stores V vertices</p>
+                    </li>
+                </ul>
+
+                <h3 style="margin-top: 30px;">For a Tree with N nodes:</h3>
+                <ul>
+                    <li>
+                        <span class="complexity-badge time-complexity">Time: O(N)</span>
+                        <p style="margin-top: 10px;">Visit each node exactly once</p>
+                    </li>
+                    <li style="margin-top: 20px;">
+                        <span class="complexity-badge space-complexity">Space: O(W)</span>
+                        <p style="margin-top: 10px;">Where W is the maximum width of the tree (maximum nodes at any level)</p>
+                    </li>
+                </ul>
+            </div>
+
+            <h3>Why is BFS Space O(W) for trees?</h3>
+            <div class="info-box">
+                <p>Consider a complete binary tree:</p>
+                <pre style="color: #98c379; text-align: left;">
+        1              Level 0: 1 node
+       / \
+      2   3            Level 1: 2 nodes
+     / \ / \
+    4  5 6  7          Level 2: 4 nodes
+                       Level 3: 8 nodes (widest)
+                </pre>
+                <p>The queue holds all nodes at the current level before moving to the next. The widest level determines the maximum queue size!</p>
+            </div>
+        </div>
+
+        <!-- Common Use Cases -->
+        <div class="section">
+            <h2>🎯 Common Use Cases for BFS</h2>
+
+            <div class="highlight-box">
+                <h3>1. Shortest Path in Unweighted Graphs</h3>
+                <p>BFS guarantees the shortest path because it explores nodes level by level.</p>
+                <ul>
+                    <li>Social network connections (shortest path between people)</li>
+                    <li>Maze solving (shortest path from start to end)</li>
+                    <li>Network routing</li>
+                </ul>
+            </div>
+
+            <div class="highlight-box">
+                <h3>2. Level-Order Traversal</h3>
+                <p>Visit nodes level by level in trees.</p>
+                <ul>
+                    <li>Binary tree level-order traversal</li>
+                    <li>Organizational hierarchy traversal</li>
+                    <li>File system traversal by depth</li>
+                </ul>
+            </div>
+
+            <div class="highlight-box">
+                <h3>3. Finding Connected Components</h3>
+                <p>Identify all nodes reachable from a starting node.</p>
+                <ul>
+                    <li>Islands in a grid</li>
+                    <li>Network connectivity</li>
+                    <li>Friend circles in social networks</li>
+                </ul>
+            </div>
+
+            <div class="highlight-box">
+                <h3>4. Web Crawling</h3>
+                <p>Crawl web pages level by level from a starting URL.</p>
+                <ul>
+                    <li>Search engine indexing</li>
+                    <li>Sitemap generation</li>
+                    <li>Link analysis</li>
+                </ul>
+            </div>
+
+            <div class="highlight-box">
+                <h3>5. Testing Bipartiteness</h3>
+                <p>Check if a graph can be colored with two colors (alternate levels).</p>
+                <ul>
+                    <li>Scheduling problems</li>
+                    <li>Matching problems</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Edge Cases -->
+        <div class="section">
+            <h2>⚠️ Edge Cases to Consider</h2>
+
+            <h3>1. Empty Graph</h3>
+            <div class="code-block"><span class="comment"># Empty graph</span>
+graph = {}
+result = bfs(graph, <span class="string">'A'</span>)
+<span class="comment"># Result: KeyError or empty list (handle appropriately)</span></div>
+
+            <h3>2. Single Node</h3>
+            <div class="code-block"><span class="comment"># Graph with one node</span>
+graph = {<span class="string">'A'</span>: []}
+result = bfs(graph, <span class="string">'A'</span>)
+<span class="comment"># Result: ['A']</span></div>
+
+            <h3>3. Disconnected Graph</h3>
+            <div class="code-block"><span class="comment"># Graph with multiple components</span>
+graph = {
+    <span class="string">'A'</span>: [<span class="string">'B'</span>],
+    <span class="string">'B'</span>: [<span class="string">'A'</span>],
+    <span class="string">'C'</span>: [<span class="string">'D'</span>],
+    <span class="string">'D'</span>: [<span class="string">'C'</span>]
+}
+result = bfs(graph, <span class="string">'A'</span>)
+<span class="comment"># Result: ['A', 'B'] - only visits connected component</span></div>
+
+            <h3>4. Graph with Cycles</h3>
+            <div class="code-block"><span class="comment"># Cyclic graph (visited set prevents infinite loops)</span>
+graph = {
+    <span class="string">'A'</span>: [<span class="string">'B'</span>],
+    <span class="string">'B'</span>: [<span class="string">'C'</span>],
+    <span class="string">'C'</span>: [<span class="string">'A'</span>]  <span class="comment"># Cycle back to A</span>
+}
+result = bfs(graph, <span class="string">'A'</span>)
+<span class="comment"># Result: ['A', 'B', 'C'] - visited set prevents revisiting A</span></div>
+
+            <div class="warning-box">
+                <strong>⚠️ Always use a visited set!</strong> Without tracking visited nodes, BFS will loop infinitely in cyclic graphs.
+            </div>
+        </div>
+
+        <!-- Practice Problems -->
+        <div class="section">
+            <h2>💪 Practice Problems</h2>
+
+            <div class="highlight-box">
+                <h3>Beginner Level:</h3>
+                <ol>
+                    <li>Binary tree level-order traversal</li>
+                    <li>Number of islands in a grid</li>
+                    <li>Minimum depth of binary tree</li>
+                </ol>
+            </div>
+
+            <div class="highlight-box">
+                <h3>Intermediate Level:</h3>
+                <ol>
+                    <li>Word Ladder (shown above)</li>
+                    <li>Rotting Oranges (multi-source BFS)</li>
+                    <li>Shortest path in binary matrix</li>
+                    <li>Open the Lock</li>
+                </ol>
+            </div>
+
+            <div class="highlight-box">
+                <h3>Advanced Level:</h3>
+                <ol>
+                    <li>Sliding Puzzle</li>
+                    <li>Bus Routes</li>
+                    <li>Minimum Knight Moves</li>
+                    <li>Shortest Path to Get All Keys</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Key Insights -->
+        <div class="section">
+            <h2>💡 Key Insights & Tips</h2>
+
+            <div class="success-box">
+                <h3>✅ When to Use BFS:</h3>
+                <ul>
+                    <li>You need the <strong>shortest path</strong> in an unweighted graph</li>
+                    <li>You want to explore nodes <strong>level by level</strong></li>
+                    <li>You're solving a <strong>minimum steps</strong> problem</li>
+                    <li>You need to find the <strong>nearest</strong> node with a property</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h3>🔍 BFS Pattern Recognition:</h3>
+                <p>Look for these keywords in problems:</p>
+                <ul>
+                    <li>"Shortest path"</li>
+                    <li>"Minimum steps"</li>
+                    <li>"Nearest"</li>
+                    <li>"Level-order"</li>
+                    <li>"Minimum distance"</li>
+                </ul>
+            </div>
+
+            <div class="highlight-box">
+                <h3>🎓 Remember:</h3>
+                <ul>
+                    <li><strong>Queue</strong> = BFS (breadth-first, iterative)</li>
+                    <li><strong>Stack/Recursion</strong> = DFS (depth-first)</li>
+                    <li>Always use a <strong>visited set</strong> to avoid infinite loops</li>
+                    <li>BFS guarantees shortest path in <strong>unweighted</strong> graphs only</li>
+                    <li>Space complexity depends on the <strong>width</strong> of the graph/tree</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Complete Test Example -->
+        <div class="section">
+            <h2>🧪 Complete Working Example</h2>
+            <p>Here's a complete, runnable Python script you can test:</p>
+
+            <div class="code-block"><span class="keyword">from</span> collections <span class="keyword">import</span> deque
+
+<span class="keyword">def</span> <span class="function">bfs</span>(graph, start):
+    <span class="string">"""
+    Perform BFS traversal on a graph.
+    
+    Args:
+        graph: Dictionary representing adjacency list
+        start: Starting node
+    
+    Returns:
+        List of nodes in BFS order
+    """</span>
+    queue = deque([start])
+    visited = <span class="keyword">set</span>([start])
+    result = []
+    
+    <span class="keyword">while</span> queue:
+        node = queue.popleft()
+        result.append(node)
+        
+        <span class="keyword">for</span> neighbor <span class="keyword">in</span> graph.get(node, []):
+            <span class="keyword">if</span> neighbor <span class="keyword">not in</span> visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+    
+    <span class="keyword">return</span> result
+
+
+<span class="keyword">def</span> <span class="function">main</span>():
+    <span class="comment"># Test Case 1: Social Network</span>
+    <span class="keyword">print</span>(<span class="string">"Test 1: Social Network Graph"</span>)
+    social_graph = {
+        <span class="string">'Alice'</span>: [<span class="string">'Bob'</span>, <span class="string">'Carol'</span>, <span class="string">'David'</span>],
+        <span class="string">'Bob'</span>: [<span class="string">'Alice'</span>, <span class="string">'Eve'</span>],
+        <span class="string">'Carol'</span>: [<span class="string">'Alice'</span>, <span class="string">'Frank'</span>],
+        <span class="string">'David'</span>: [<span class="string">'Alice'</span>, <span class="string">'Grace'</span>],
+        <span class="string">'Eve'</span>: [<span class="string">'Bob'</span>],
+        <span class="string">'Frank'</span>: [<span class="string">'Carol'</span>, <span class="string">'Henry'</span>],
+        <span class="string">'Grace'</span>: [<span class="string">'David'</span>],
+        <span class="string">'Henry'</span>: [<span class="string">'Frank'</span>]
+    }
+    result = bfs(social_graph, <span class="string">'Alice'</span>)
+    <span class="keyword">print</span>(<span class="string">f"BFS Order: </span>{result}<span class="string">"</span>)
+    <span class="keyword">print</span>()
+    
+    <span class="comment"># Test Case 2: Simple Tree</span>
+    <span class="keyword">print</span>(<span class="string">"Test 2: Binary Tree"</span>)
+    tree = {
+        <span class="number">1</span>: [<span class="number">2</span>, <span class="number">3</span>],
+        <span class="number">2</span>: [<span class="number">4</span>, <span class="number">5</span>],
+        <span class="number">3</span>: [<span class="number">6</span>, <span class="number">7</span>],
+        <span class="number">4</span>: [],
+        <span class="number">5</span>: [],
+        <span class="number">6</span>: [],
+        <span class="number">7</span>: []
+    }
+    result = bfs(tree, <span class="number">1</span>)
+    <span class="keyword">print</span>(<span class="string">f"BFS Order: </span>{result}<span class="string">"</span>)
+    <span class="keyword">print</span>(<span class="string">"Expected: [1, 2, 3, 4, 5, 6, 7] (level-order)"</span>)
+    <span class="keyword">print</span>()
+    
+    <span class="comment"># Test Case 3: Disconnected Graph</span>
+    <span class="keyword">print</span>(<span class="string">"Test 3: Disconnected Graph"</span>)
+    disconnected = {
+        <span class="string">'A'</span>: [<span class="string">'B'</span>],
+        <span class="string">'B'</span>: [<span class="string">'A'</span>],
+        <span class="string">'C'</span>: [<span class="string">'D'</span>],
+        <span class="string">'D'</span>: [<span class="string">'C'</span>]
+    }
+    result = bfs(disconnected, <span class="string">'A'</span>)
+    <span class="keyword">print</span>(<span class="string">f"BFS from A: </span>{result}<span class="string">"</span>)
+    <span class="keyword">print</span>(<span class="string">"Note: Only visits connected component"</span>)
+
+
+<span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:
+    main()</div>
+
+            <div class="success-box">
+                <strong>🚀 To run this code:</strong>
+                <ol>
+                    <li>Save to a file: <code>bfs_example.py</code></li>
+                    <li>Run: <code>python bfs_example.py</code></li>
+                    <li>Experiment by modifying the graphs!</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="section" style="text-align: center; border: none; background: transparent;">
+            <h2 style="color: #61dafb; border: none;">🎉 You've Mastered BFS!</h2>
+            <p style="font-size: 1.1em; margin-top: 20px;">
+                Remember: BFS = Queue + Level-by-level + Shortest Path
+            </p>
+            <p style="color: #98c379; margin-top: 10px;">
+                Practice with the examples above and you'll be solving BFS problems in no time!
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Make sections collapsible
+        const collapsibles = document.getElementsByClassName("collapsible");
+        for (let i = 0; i < collapsibles.length; i++) {
+            collapsibles[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                const content = this.nextElementSibling;
+                content.classList.toggle("active");
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recursion in Python - Complete Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #2d1b3d 0%, #1a0f2e 100%);
+            color: #e0e0e0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #282c34;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #c678dd;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(198, 120, 221, 0.3);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #98c379;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #e06c75;
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e06c75;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #d19a66;
+            font-size: 1.4em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        h4 {
+            color: #61dafb;
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            background: #21252b;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 4px solid #c678dd;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            border: 1px solid #3e4451;
+            white-space: pre-wrap;
+            line-height: 1.8;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .keyword {
+            color: #c678dd;
+            font-weight: bold;
+        }
+
+        .function {
+            color: #61dafb;
+        }
+
+        .string {
+            color: #98c379;
+        }
+
+        .comment {
+            color: #5c6370;
+            font-style: italic;
+        }
+
+        .number {
+            color: #d19a66;
+        }
+
+        .variable {
+            color: #e5c07b;
+        }
+
+        .operator {
+            color: #56b6c2;
+        }
+
+        .collapsible {
+            background: #3e4451;
+            color: #c678dd;
+            cursor: pointer;
+            padding: 15px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+
+        .collapsible:hover {
+            background: #4b5263;
+        }
+
+        .collapsible:after {
+            content: '\25BC';
+            float: right;
+            margin-left: 10px;
+        }
+
+        .collapsible.active:after {
+            content: '\25B2';
+        }
+
+        .content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background: #21252b;
+            padding: 0 20px;
+            border-radius: 0 0 6px 6px;
+        }
+
+        .content.active {
+            padding: 20px;
+            max-height: 10000px;
+        }
+
+        .visual-box {
+            background: #1e1e1e;
+            border: 2px solid #c678dd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .call-stack {
+            background: #1e1e1e;
+            border: 2px solid #61dafb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .stack-frame {
+            background: #3e4451;
+            border-left: 4px solid #61dafb;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .stack-frame.active {
+            background: #e06c75;
+            border-color: #e06c75;
+            animation: pulse 1s infinite;
+        }
+
+        .stack-frame.returning {
+            background: #98c379;
+            border-color: #98c379;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.02);
+            }
+        }
+
+        .step-box {
+            background: #2c313a;
+            border-left: 4px solid #d19a66;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .step-title {
+            color: #d19a66;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .highlight-box {
+            background: #2c313a;
+            border: 2px solid #98c379;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .highlight-title {
+            color: #98c379;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .info-box {
+            background: #1e3a5f;
+            border-left: 4px solid #61dafb;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background: #5f3a1e;
+            border-left: 4px solid #d19a66;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .success-box {
+            background: #1e5f3a;
+            border-left: 4px solid #98c379;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .error-box {
+            background: #5f1e1e;
+            border-left: 4px solid #e06c75;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #1e1e1e;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #3e4451;
+            color: #c678dd;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #3e4451;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: #2c313a;
+        }
+
+        .tree-visual {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: monospace;
+            color: #98c379;
+            overflow-x: auto;
+        }
+
+        .pattern-card {
+            background: #2c313a;
+            border: 2px solid #c678dd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .pattern-title {
+            color: #c678dd;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        code {
+            background: #3e4451;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            color: #e5c07b;
+        }
+
+        .flowchart {
+            background: #1e1e1e;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .flow-box {
+            background: #3e4451;
+            border: 2px solid #c678dd;
+            padding: 15px 25px;
+            border-radius: 8px;
+            display: inline-block;
+            margin: 10px;
+            color: #e0e0e0;
+        }
+
+        .flow-arrow {
+            color: #d19a66;
+            font-size: 24px;
+            margin: 10px 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 5px;
+            font-size: 0.9em;
+        }
+
+        .badge-base {
+            background: #e06c75;
+            color: #ffffff;
+        }
+
+        .badge-recursive {
+            background: #61dafb;
+            color: #1e1e1e;
+        }
+
+        .badge-return {
+            background: #98c379;
+            color: #1e1e1e;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .comparison-card {
+            background: #2c313a;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid #3e4451;
+        }
+
+        .comparison-card h4 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Mastering Recursion in Python</h1>
+        <div class="subtitle">From Confusion to Clarity - A Visual Guide</div>
+
+        <!-- Introduction -->
+        <div class="section">
+            <h2>🎯 What is Recursion?</h2>
+            <p><strong>Recursion</strong> is when a function calls itself to solve a smaller version of the same problem. It's like looking into two mirrors facing each other - you see infinite reflections!</p>
+
+            <div class="highlight-box">
+                <div class="highlight-title">🧩 The Recursion Formula</div>
+                <p>Every recursive function has THREE essential parts:</p>
+                <ol>
+                    <li><strong>Base Case</strong> - The stopping condition (when to STOP calling itself)</li>
+                    <li><strong>Recursive Case</strong> - The function calling itself with a simpler input</li>
+                    <li><strong>Progress Toward Base Case</strong> - Each call must get closer to the base case</li>
+                </ol>
+            </div>
+
+            <div class="flowchart">
+                <div class="flow-box">Function is called</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-box">Is this the base case?</div>
+                <div class="flow-arrow">↙ YES &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NO ↘</div>
+                <div style="display: flex; justify-content: center; gap: 50px; flex-wrap: wrap;">
+                    <div class="flow-box" style="background: #98c379;">Return the answer</div>
+                    <div class="flow-box" style="background: #e06c75;">Call function again<br>(with simpler input)</div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <strong>⚠️ Without a proper base case, your recursion will run forever!</strong> This is called infinite recursion and will crash your program with a "RecursionError: maximum recursion depth exceeded" error.
+            </div>
+        </div>
+
+        <!-- Simple Example 1: Countdown -->
+        <div class="section">
+            <h2>🚀 Example 1: Countdown (The Simplest Recursion)</h2>
+            <p>Let's start with the most basic example - counting down from a number to 1.</p>
+
+            <h3>The Code:</h3>
+            <div class="code-block"><span class="keyword">def</span> <span class="function">countdown</span>(n):
+    <span class="comment"># BASE CASE: Stop when we reach 0</span>
+    <span class="keyword">if</span> n <= <span class="number">0</span>:
+        <span class="keyword">print</span>(<span class="string">"Blastoff! 🚀"</span>)
+        <span class="keyword">return</span>
+    
+    <span class="comment"># Print current number</span>
+    <span class="keyword">print</span>(n)
+    
+    <span class="comment"># RECURSIVE CASE: Call with n-1 (simpler problem)</span>
+    countdown(n - <span class="number">1</span>)
+
+<span class="comment"># Test it</span>
+countdown(<span class="number">5</span>)</div>
+
+            <button class="collapsible">Click to see the call stack visualization</button>
+            <div class="content">
+                <h3>Call Stack Visualization for countdown(5):</h3>
+
+                <div class="step-box">
+                    <div class="step-title">Step 1: countdown(5) is called</div>
+                    <div class="call-stack">
+                        <div class="stack-frame active">
+                            <strong>countdown(5)</strong><br>
+                            n = 5<br>
+                            → Prints "5"<br>
+                            → Calls countdown(4)
+                        </div>
+                    </div>
+                    <p><strong>Output so far:</strong> 5</p>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Step 2: countdown(4) is called</div>
+                    <div class="call-stack">
+                        <div class="stack-frame">
+                            <strong>countdown(5)</strong><br>
+                            <span class="comment">Waiting for countdown(4)...</span>
+                        </div>
+                        <div class="stack-frame active">
+                            <strong>countdown(4)</strong><br>
+                            n = 4<br>
+                            → Prints "4"<br>
+                            → Calls countdown(3)
+                        </div>
+                    </div>
+                    <p><strong>Output so far:</strong> 5, 4</p>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Step 3: countdown(3) is called</div>
+                    <div class="call-stack">
+                        <div class="stack-frame">
+                            <strong>countdown(5)</strong><br>
+                            <span class="comment">Waiting...</span>
+                        </div>
+                        <div class="stack-frame">
+                            <strong>countdown(4)</strong><br>
+                            <span class="comment">Waiting...</span>
+                        </div>
+                        <div class="stack-frame active">
+                            <strong>countdown(3)</strong><br>
+                            n = 3<br>
+                            → Prints "3"<br>
+                            → Calls countdown(2)
+                        </div>
+                    </div>
+                    <p><strong>Output so far:</strong> 5, 4, 3</p>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Step 4: countdown(2) is called</div>
+                    <div class="call-stack">
+                        <div class="stack-frame">countdown(5) <span class="comment">Waiting...</span></div>
+                        <div class="stack-frame">countdown(4) <span class="comment">Waiting...</span></div>
+                        <div class="stack-frame">countdown(3) <span class="comment">Waiting...</span></div>
+                        <div class="stack-frame active">
+                            <strong>countdown(2)</strong><br>
+                            n = 2<br>
+                            → Prints "2"<br>
+                            → Calls countdown(1)
+                        </div>
+                    </div>
+                    <p><strong>Output so far:</strong> 5, 4, 3, 2</p>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Step 5: countdown(1) is called</div>
+                    <div class="call-stack">
+                        <div class="stack-frame">countdown(5)</div>
+                        <div class="stack-frame">countdown(4)</div>
+                        <div class="stack-frame">countdown(3)</div>
+                        <div class="stack-frame">countdown(2)</div>
+                        <div class="stack-frame active">
+                            <strong>countdown(1)</strong><br>
+                            n = 1<br>
+                            → Prints "1"<br>
+                            → Calls countdown(0)
+                        </div>
+                    </div>
+                    <p><strong>Output so far:</strong> 5, 4, 3, 2, 1</p>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Step 6: countdown(0) - BASE CASE!</div>
+                    <div class="call-stack">
+                        <div class="stack-frame">countdown(5)</div>
+                        <div class="stack-frame">countdown(4)</div>
+                        <div class="stack-frame">countdown(3)</div>
+                        <div class="stack-frame">countdown(2)</div>
+                        <div class="stack-frame">countdown(1)</div>
+                        <div class="stack-frame active" style="background: #98c379; border-color: #98c379;">
+                            <strong>countdown(0)</strong><br>
+                            n = 0<br>
+                            ✅ BASE CASE REACHED!<br>
+                            → Prints "Blastoff! 🚀"<br>
+                            → Returns (no more recursion)
+                        </div>
+                    </div>
+                    <p><strong>Final Output:</strong> 5, 4, 3, 2, 1, Blastoff! 🚀</p>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Step 7-11: Stack Unwinding (Returns)</div>
+                    <p>Now all the waiting functions return one by one:</p>
+                    <div class="call-stack">
+                        <div class="stack-frame returning">countdown(1) ✅ Returns</div>
+                        <div class="stack-frame returning">countdown(2) ✅ Returns</div>
+                        <div class="stack-frame returning">countdown(3) ✅ Returns</div>
+                        <div class="stack-frame returning">countdown(4) ✅ Returns</div>
+                        <div class="stack-frame returning">countdown(5) ✅ Returns</div>
+                    </div>
+                    <p><strong>Done!</strong> All functions have returned and the call stack is empty.</p>
+                </div>
+
+                <div class="info-box">
+                    <strong>💡 Key Insight:</strong> The function keeps calling itself with smaller values until it hits the base case. Then it "unwinds" - each function returns in reverse order (like peeling layers off an onion).
+                </div>
+            </div>
+        </div>
+
+        <!-- Example 2: Factorial -->
+        <div class="section">
+            <h2>🎯 Example 2: Factorial (Building Up a Result)</h2>
+            <p>Factorial of n (written as n!) = n × (n-1) × (n-2) × ... × 1</p>
+            <p>Example: 5! = 5 × 4 × 3 × 2 × 1 = 120</p>
+
+            <div class="highlight-box">
+                <div class="highlight-title">🤔 The Recursive Insight</div>
+                <p>Notice that: <strong>5! = 5 × 4!</strong></p>
+                <p>And: <strong>4! = 4 × 3!</strong></p>
+                <p>And: <strong>3! = 3 × 2!</strong></p>
+                <p>Pattern: <strong>n! = n × (n-1)!</strong></p>
+                <p>Base case: <strong>1! = 1</strong> (or 0! = 1)</p>
+            </div>
+
+            <h3>The Code:</h3>
+            <div class="code-block"><span class="keyword">def</span> <span class="function">factorial</span>(n):
+    <span class="comment"># BASE CASE: factorial of 0 or 1 is 1</span>
+    <span class="keyword">if</span> n <= <span class="number">1</span>:
+        <span class="keyword">return</span> <span class="number">1</span>
+    
+    <span class="comment"># RECURSIVE CASE: n! = n × (n-1)!</span>
+    <span class="keyword">return</span> n * factorial(n - <span class="number">1</span>)
+
+<span class="comment"># Test it</span>
+result = factorial(<span class="number">5</span>)
+<span class="keyword">print</span>(<span class="string">f"5! = </span>{result}<span class="string">"</span>)  <span class="comment"># Output: 5! = 120</span></div>
+
+            <button class="collapsible">Click to see step-by-step trace with return values</button>
+            <div class="content">
+                <h3>Complete Trace of factorial(5):</h3>
+
+                <div class="step-box">
+                    <div class="step-title">🔽 Going Down (Making Recursive Calls)</div>
+                    
+                    <div class="call-stack">
+                        <div class="stack-frame">
+                            <strong>factorial(5)</strong><br>
+                            n = 5<br>
+                            → Returns: 5 × factorial(4)<br>
+                            <span class="comment">Waiting for factorial(4)...</span>
+                        </div>
+                    </div>
+
+                    <div class="call-stack">
+                        <div class="stack-frame">factorial(5) <span class="comment">waiting...</span></div>
+                        <div class="stack-frame">
+                            <strong>factorial(4)</strong><br>
+                            n = 4<br>
+                            → Returns: 4 × factorial(3)<br>
+                            <span class="comment">Waiting for factorial(3)...</span>
+                        </div>
+                    </div>
+
+                    <div class="call-stack">
+                        <div class="stack-frame">factorial(5) <span class="comment">waiting...</span></div>
+                        <div class="stack-frame">factorial(4) <span class="comment">waiting...</span></div>
+                        <div class="stack-frame">
+                            <strong>factorial(3)</strong><br>
+                            n = 3<br>
+                            → Returns: 3 × factorial(2)<br>
+                            <span class="comment">Waiting for factorial(2)...</span>
+                        </div>
+                    </div>
+
+                    <div class="call-stack">
+                        <div class="stack-frame">factorial(5)</div>
+                        <div class="stack-frame">factorial(4)</div>
+                        <div class="stack-frame">factorial(3)</div>
+                        <div class="stack-frame">
+                            <strong>factorial(2)</strong><br>
+                            n = 2<br>
+                            → Returns: 2 × factorial(1)<br>
+                            <span class="comment">Waiting for factorial(1)...</span>
+                        </div>
+                    </div>
+
+                    <div class="call-stack">
+                        <div class="stack-frame">factorial(5)</div>
+                        <div class="stack-frame">factorial(4)</div>
+                        <div class="stack-frame">factorial(3)</div>
+                        <div class="stack-frame">factorial(2)</div>
+                        <div class="stack-frame active" style="background: #98c379; border-color: #98c379;">
+                            <strong>factorial(1)</strong><br>
+                            n = 1<br>
+                            ✅ BASE CASE!<br>
+                            → Returns: <strong>1</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">🔼 Coming Back Up (Returning Values)</div>
+                    <p>Now we can calculate the actual values as we return:</p>
+
+                    <div class="call-stack">
+                        <div class="stack-frame">factorial(5) <span class="comment">waiting...</span></div>
+                        <div class="stack-frame">factorial(4) <span class="comment">waiting...</span></div>
+                        <div class="stack-frame">factorial(3) <span class="comment">waiting...</span></div>
+                        <div class="stack-frame returning">
+                            <strong>factorial(2)</strong><br>
+                            Returns: 2 × <strong>1</strong> = <strong>2</strong>
+                        </div>
+                    </div>
+
+                    <div class="call-stack">
+                        <div class="stack-frame">factorial(5) <span class="comment">waiting...</span></div>
+                        <div class="stack-frame">factorial(4) <span class="comment">waiting...</span></div>
+                        <div class="stack-frame returning">
+                            <strong>factorial(3)</strong><br>
+                            Returns: 3 × <strong>2</strong> = <strong>6</strong>
+                        </div>
+                    </div>
+
+                    <div class="call-stack">
+                        <div class="stack-frame">factorial(5) <span class="comment">waiting...</span></div>
+                        <div class="stack-frame returning">
+                            <strong>factorial(4)</strong><br>
+                            Returns: 4 × <strong>6</strong> = <strong>24</strong>
+                        </div>
+                    </div>
+
+                    <div class="call-stack">
+                        <div class="stack-frame returning">
+                            <strong>factorial(5)</strong><br>
+                            Returns: 5 × <strong>24</strong> = <strong>120</strong>
+                        </div>
+                    </div>
+
+                    <div class="success-box">
+                        <strong>✅ Final Answer: 120</strong><br><br>
+                        <strong>The Journey:</strong><br>
+                        factorial(5) = 5 × factorial(4)<br>
+                        &nbsp;&nbsp;= 5 × (4 × factorial(3))<br>
+                        &nbsp;&nbsp;= 5 × (4 × (3 × factorial(2)))<br>
+                        &nbsp;&nbsp;= 5 × (4 × (3 × (2 × factorial(1))))<br>
+                        &nbsp;&nbsp;= 5 × (4 × (3 × (2 × 1)))<br>
+                        &nbsp;&nbsp;= 5 × (4 × (3 × 2))<br>
+                        &nbsp;&nbsp;= 5 × (4 × 6)<br>
+                        &nbsp;&nbsp;= 5 × 24<br>
+                        &nbsp;&nbsp;= <strong>120</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Example 3: Fibonacci -->
+        <div class="section">
+            <h2>🎯 Example 3: Fibonacci Sequence</h2>
+            <p>The Fibonacci sequence: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34...</p>
+            <p>Each number is the sum of the two preceding ones: <strong>fib(n) = fib(n-1) + fib(n-2)</strong></p>
+
+            <h3>The Code:</h3>
+            <div class="code-block"><span class="keyword">def</span> <span class="function">fibonacci</span>(n):
+    <span class="comment"># BASE CASES: First two numbers are defined</span>
+    <span class="keyword">if</span> n == <span class="number">0</span>:
+        <span class="keyword">return</span> <span class="number">0</span>
+    <span class="keyword">if</span> n == <span class="number">1</span>:
+        <span class="keyword">return</span> <span class="number">1</span>
+    
+    <span class="comment"># RECURSIVE CASE: Sum of previous two</span>
+    <span class="keyword">return</span> fibonacci(n - <span class="number">1</span>) + fibonacci(n - <span class="number">2</span>)
+
+<span class="comment"># Test it</span>
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="keyword">range</span>(<span class="number">10</span>):
+    <span class="keyword">print</span>(<span class="string">f"fib(</span>{i}<span class="string">) = </span>{fibonacci(i)}<span class="string">"</span>)</div>
+
+            <button class="collapsible">Click to see the recursion tree</button>
+            <div class="content">
+                <h3>Recursion Tree for fibonacci(5):</h3>
+                <p>Notice how this function makes TWO recursive calls!</p>
+
+                <div class="tree-visual">
+                                fib(5)
+                               /      \
+                          fib(4)      fib(3)
+                         /     \      /     \
+                    fib(3)   fib(2) fib(2) fib(1)
+                    /   \    /   \   /   \
+                fib(2) fib(1) fib(1) fib(0) fib(1) fib(0)
+                /   \
+            fib(1) fib(0)
+                </div>
+
+                <div class="info-box">
+                    <strong>💡 Key Observations:</strong>
+                    <ul>
+                        <li>The tree branches into TWO at each level</li>
+                        <li>Notice <strong>fib(2)</strong> is calculated THREE times!</li>
+                        <li>Notice <strong>fib(3)</strong> is calculated TWICE!</li>
+                        <li>This is inefficient - we're doing duplicate work!</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Calculation Order (Post-order traversal):</div>
+                    <ol>
+                        <li>fib(0) = 0 ✅</li>
+                        <li>fib(1) = 1 ✅</li>
+                        <li>fib(2) = fib(1) + fib(0) = 1 + 0 = 1</li>
+                        <li>fib(1) = 1 ✅</li>
+                        <li>fib(3) = fib(2) + fib(1) = 1 + 1 = 2</li>
+                        <li>fib(2) = 1 (calculated again!)</li>
+                        <li>fib(4) = fib(3) + fib(2) = 2 + 1 = 3</li>
+                        <li>fib(3) = 2 (calculated again!)</li>
+                        <li>fib(5) = fib(4) + fib(3) = 3 + 2 = <strong>5</strong></li>
+                    </ol>
+                </div>
+
+                <div class="warning-box">
+                    <strong>⚠️ Performance Issue!</strong><br>
+                    Time complexity: <strong>O(2ⁿ)</strong> - exponential!<br>
+                    This gets very slow for large n. Try fibonacci(40) and watch it struggle!
+                </div>
+
+                <h3>Optimized Version with Memoization:</h3>
+                <div class="code-block"><span class="keyword">def</span> <span class="function">fibonacci_memo</span>(n, memo=<span class="keyword">None</span>):
+    <span class="comment"># Initialize memo dictionary on first call</span>
+    <span class="keyword">if</span> memo <span class="keyword">is</span> <span class="keyword">None</span>:
+        memo = {}
+    
+    <span class="comment"># Check if we've already calculated this</span>
+    <span class="keyword">if</span> n <span class="keyword">in</span> memo:
+        <span class="keyword">return</span> memo[n]
+    
+    <span class="comment"># BASE CASES</span>
+    <span class="keyword">if</span> n == <span class="number">0</span>:
+        <span class="keyword">return</span> <span class="number">0</span>
+    <span class="keyword">if</span> n == <span class="number">1</span>:
+        <span class="keyword">return</span> <span class="number">1</span>
+    
+    <span class="comment"># Calculate and store in memo</span>
+    memo[n] = fibonacci_memo(n - <span class="number">1</span>, memo) + fibonacci_memo(n - <span class="number">2</span>, memo)
+    <span class="keyword">return</span> memo[n]
+
+<span class="comment"># Now try larger numbers!</span>
+<span class="keyword">print</span>(fibonacci_memo(<span class="number">40</span>))  <span class="comment"># Fast! Result: 102334155</span></div>
+
+                <div class="success-box">
+                    <strong>✅ Memoization transforms O(2ⁿ) to O(n)!</strong><br>
+                    We calculate each fib(k) only once and remember the result.
+                </div>
+            </div>
+        </div>
+
+        <!-- Example 4: List Operations -->
+        <div class="section">
+            <h2>🎯 Example 4: Sum of List (Understanding List Recursion)</h2>
+            <p>Calculate the sum of all numbers in a list using recursion.</p>
+
+            <div class="highlight-box">
+                <div class="highlight-title">🤔 The Recursive Insight</div>
+                <p><strong>Sum of [1, 2, 3, 4, 5]</strong></p>
+                <p>= 1 + sum of [2, 3, 4, 5]</p>
+                <p>= 1 + (2 + sum of [3, 4, 5])</p>
+                <p>= 1 + (2 + (3 + sum of [4, 5]))</p>
+                <p>= 1 + (2 + (3 + (4 + sum of [5])))</p>
+                <p>= 1 + (2 + (3 + (4 + (5 + sum of []))))</p>
+                <p>= 1 + (2 + (3 + (4 + (5 + 0))))</p>
+            </div>
+
+            <h3>The Code:</h3>
+            <div class="code-block"><span class="keyword">def</span> <span class="function">sum_list</span>(numbers):
+    <span class="comment"># BASE CASE: Empty list has sum of 0</span>
+    <span class="keyword">if</span> <span class="keyword">len</span>(numbers) == <span class="number">0</span>:
+        <span class="keyword">return</span> <span class="number">0</span>
+    
+    <span class="comment"># RECURSIVE CASE: First element + sum of rest</span>
+    <span class="keyword">return</span> numbers[<span class="number">0</span>] + sum_list(numbers[<span class="number">1</span>:])
+
+<span class="comment"># Test it</span>
+result = sum_list([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>])
+<span class="keyword">print</span>(<span class="string">f"Sum: </span>{result}<span class="string">"</span>)  <span class="comment"># Output: 15</span></div>
+
+            <button class="collapsible">Click to see the visualization</button>
+            <div class="content">
+                <h3>Step-by-Step Trace:</h3>
+
+                <div class="step-box">
+                    <div class="step-title">Call 1: sum_list([1, 2, 3, 4, 5])</div>
+                    <p>List is not empty, so:</p>
+                    <p>Return: <strong>1</strong> + sum_list([2, 3, 4, 5])</p>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Call 2: sum_list([2, 3, 4, 5])</div>
+                    <p>Return: <strong>2</strong> + sum_list([3, 4, 5])</p>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Call 3: sum_list([3, 4, 5])</div>
+                    <p>Return: <strong>3</strong> + sum_list([4, 5])</p>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Call 4: sum_list([4, 5])</div>
+                    <p>Return: <strong>4</strong> + sum_list([5])</p>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Call 5: sum_list([5])</div>
+                    <p>Return: <strong>5</strong> + sum_list([])</p>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Call 6: sum_list([]) - BASE CASE!</div>
+                    <p>Empty list! Return: <strong>0</strong></p>
+                </div>
+
+                <div class="success-box">
+                    <strong>🔼 Now Unwinding:</strong><br>
+                    sum_list([5]) = 5 + 0 = <strong>5</strong><br>
+                    sum_list([4, 5]) = 4 + 5 = <strong>9</strong><br>
+                    sum_list([3, 4, 5]) = 3 + 9 = <strong>12</strong><br>
+                    sum_list([2, 3, 4, 5]) = 2 + 12 = <strong>14</strong><br>
+                    sum_list([1, 2, 3, 4, 5]) = 1 + 14 = <strong>15</strong>
+                </div>
+            </div>
+
+            <h3>More List Examples:</h3>
+            <div class="code-block"><span class="keyword">def</span> <span class="function">length</span>(lst):
+    <span class="comment"># Count elements in a list</span>
+    <span class="keyword">if</span> <span class="keyword">len</span>(lst) == <span class="number">0</span>:
+        <span class="keyword">return</span> <span class="number">0</span>
+    <span class="keyword">return</span> <span class="number">1</span> + length(lst[<span class="number">1</span>:])
+
+
+<span class="keyword">def</span> <span class="function">maximum</span>(lst):
+    <span class="comment"># Find the maximum value in a list</span>
+    <span class="keyword">if</span> <span class="keyword">len</span>(lst) == <span class="number">1</span>:
+        <span class="keyword">return</span> lst[<span class="number">0</span>]
+    
+    <span class="comment"># Compare first element with max of rest</span>
+    max_of_rest = maximum(lst[<span class="number">1</span>:])
+    <span class="keyword">return</span> lst[<span class="number">0</span>] <span class="keyword">if</span> lst[<span class="number">0</span>] > max_of_rest <span class="keyword">else</span> max_of_rest
+
+
+<span class="keyword">def</span> <span class="function">reverse</span>(lst):
+    <span class="comment"># Reverse a list</span>
+    <span class="keyword">if</span> <span class="keyword">len</span>(lst) == <span class="number">0</span>:
+        <span class="keyword">return</span> []
+    
+    <span class="comment"># Last element becomes first</span>
+    <span class="keyword">return</span> [lst[-<span class="number">1</span>]] + reverse(lst[:-<span class="number">1</span>])
+
+<span class="comment"># Test them</span>
+<span class="keyword">print</span>(length([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]))        <span class="comment"># 4</span>
+<span class="keyword">print</span>(maximum([<span class="number">3</span>, <span class="number">7</span>, <span class="number">2</span>, <span class="number">9</span>, <span class="number">1</span>]))   <span class="comment"># 9</span>
+<span class="keyword">print</span>(reverse([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]))     <span class="comment"># [4, 3, 2, 1]</span></div>
+        </div>
+
+        <!-- Example 5: String Operations -->
+        <div class="section">
+            <h2>🎯 Example 5: Palindrome Check (String Recursion)</h2>
+            <p>Check if a string reads the same forwards and backwards.</p>
+
+            <h3>The Code:</h3>
+            <div class="code-block"><span class="keyword">def</span> <span class="function">is_palindrome</span>(s):
+    <span class="comment"># Remove spaces and convert to lowercase</span>
+    s = s.replace(<span class="string">" "</span>, <span class="string">""</span>).lower()
+    
+    <span class="comment"># BASE CASES:</span>
+    <span class="comment"># - Empty string or single character is a palindrome</span>
+    <span class="keyword">if</span> <span class="keyword">len</span>(s) <= <span class="number">1</span>:
+        <span class="keyword">return</span> <span class="keyword">True</span>
+    
+    <span class="comment"># RECURSIVE CASE:</span>
+    <span class="comment"># - Check if first and last characters match</span>
+    <span class="comment"># - Then check if the middle part is a palindrome</span>
+    <span class="keyword">if</span> s[<span class="number">0</span>] != s[-<span class="number">1</span>]:
+        <span class="keyword">return</span> <span class="keyword">False</span>
+    
+    <span class="keyword">return</span> is_palindrome(s[<span class="number">1</span>:-<span class="number">1</span>])
+
+<span class="comment"># Test cases</span>
+<span class="keyword">print</span>(is_palindrome(<span class="string">"racecar"</span>))         <span class="comment"># True</span>
+<span class="keyword">print</span>(is_palindrome(<span class="string">"A man a plan a canal Panama"</span>))  <span class="comment"># True</span>
+<span class="keyword">print</span>(is_palindrome(<span class="string">"hello"</span>))           <span class="comment"># False</span></div>
+
+            <button class="collapsible">Click to see the trace</button>
+            <div class="content">
+                <h3>Trace for is_palindrome("racecar"):</h3>
+
+                <div class="step-box">
+                    <div class="step-title">Call 1: is_palindrome("racecar")</div>
+                    <p>First char: 'r', Last char: 'r' ✅ Match!</p>
+                    <p>Check middle: is_palindrome("aceca")</p>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Call 2: is_palindrome("aceca")</div>
+                    <p>First char: 'a', Last char: 'a' ✅ Match!</p>
+                    <p>Check middle: is_palindrome("cec")</p>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Call 3: is_palindrome("cec")</div>
+                    <p>First char: 'c', Last char: 'c' ✅ Match!</p>
+                    <p>Check middle: is_palindrome("e")</p>
+                </div>
+
+                <div class="step-box">
+                    <div class="step-title">Call 4: is_palindrome("e") - BASE CASE!</div>
+                    <p>Single character! Return: <strong>True</strong></p>
+                </div>
+
+                <div class="success-box">
+                    <strong>🔼 Unwinding:</strong><br>
+                    is_palindrome("e") = True<br>
+                    is_palindrome("cec") = True (because "e" is True)<br>
+                    is_palindrome("aceca") = True (because "cec" is True)<br>
+                    is_palindrome("racecar") = <strong>True</strong> ✅
+                </div>
+            </div>
+        </div>
+
+        <!-- Common Recursion Patterns -->
+        <div class="section">
+            <h2>🎨 Common Recursion Patterns</h2>
+            <p>Once you recognize these patterns, recursion becomes much easier!</p>
+
+            <div class="pattern-card">
+                <div class="pattern-title">Pattern 1: Divide and Conquer</div>
+                <p>Break problem into smaller subproblems, solve each, combine results.</p>
+                <div class="code-block"><span class="keyword">def</span> <span class="function">merge_sort</span>(arr):
+    <span class="keyword">if</span> <span class="keyword">len</span>(arr) <= <span class="number">1</span>:
+        <span class="keyword">return</span> arr
+    
+    <span class="comment"># Divide</span>
+    mid = <span class="keyword">len</span>(arr) // <span class="number">2</span>
+    left = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+    
+    <span class="comment"># Conquer (merge)</span>
+    <span class="keyword">return</span> merge(left, right)</div>
+                <p><strong>Examples:</strong> Merge sort, Quick sort, Binary search</p>
+            </div>
+
+            <div class="pattern-card">
+                <div class="pattern-title">Pattern 2: Linear Recursion</div>
+                <p>Process one element, recurse on the rest.</p>
+                <div class="code-block"><span class="keyword">def</span> <span class="function">process_list</span>(lst):
+    <span class="keyword">if</span> <span class="keyword">not</span> lst:
+        <span class="keyword">return</span> base_value
+    
+    <span class="comment"># Process first element</span>
+    result = do_something(lst[<span class="number">0</span>])
+    
+    <span class="comment"># Recurse on rest</span>
+    <span class="keyword">return</span> combine(result, process_list(lst[<span class="number">1</span>:]))</div>
+                <p><strong>Examples:</strong> Sum, length, find maximum, list reversal</p>
+            </div>
+
+            <div class="pattern-card">
+                <div class="pattern-title">Pattern 3: Multiple Recursion</div>
+                <p>Make multiple recursive calls (tree-like structure).</p>
+                <div class="code-block"><span class="keyword">def</span> <span class="function">fibonacci</span>(n):
+    <span class="keyword">if</span> n <= <span class="number">1</span>:
+        <span class="keyword">return</span> n
+    
+    <span class="comment"># Two recursive calls!</span>
+    <span class="keyword">return</span> fibonacci(n - <span class="number">1</span>) + fibonacci(n - <span class="number">2</span>)</div>
+                <p><strong>Examples:</strong> Fibonacci, tree traversal, combination problems</p>
+            </div>
+
+            <div class="pattern-card">
+                <div class="pattern-title">Pattern 4: Tail Recursion</div>
+                <p>Recursive call is the last operation (can be optimized to iteration).</p>
+                <div class="code-block"><span class="keyword">def</span> <span class="function">factorial_tail</span>(n, accumulator=<span class="number">1</span>):
+    <span class="keyword">if</span> n <= <span class="number">1</span>:
+        <span class="keyword">return</span> accumulator
+    
+    <span class="comment"># Recursive call is the LAST thing</span>
+    <span class="keyword">return</span> factorial_tail(n - <span class="number">1</span>, n * accumulator)</div>
+                <p><strong>Note:</strong> Python doesn't optimize tail recursion, but the pattern is useful!</p>
+            </div>
+
+            <div class="pattern-card">
+                <div class="pattern-title">Pattern 5: Backtracking</div>
+                <p>Try possibilities, backtrack if they don't work.</p>
+                <div class="code-block"><span class="keyword">def</span> <span class="function">solve</span>(state):
+    <span class="keyword">if</span> is_solution(state):
+        <span class="keyword">return</span> state
+    
+    <span class="keyword">for</span> choice <span class="keyword">in</span> get_choices(state):
+        <span class="comment"># Try this choice</span>
+        new_state = make_choice(state, choice)
+        result = solve(new_state)
+        
+        <span class="keyword">if</span> result:
+            <span class="keyword">return</span> result
+        <span class="comment"># Otherwise, backtrack and try next choice</span>
+    
+    <span class="keyword">return</span> <span class="keyword">None</span></div>
+                <p><strong>Examples:</strong> N-Queens, Sudoku solver, maze solving</p>
+            </div>
+        </div>
+
+        <!-- Recursion vs Iteration -->
+        <div class="section">
+            <h2>🔄 Recursion vs Iteration</h2>
+
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <h4 style="color: #c678dd;">🔁 Recursion</h4>
+                    <p><strong>Pros:</strong></p>
+                    <ul>
+                        <li>More elegant and readable</li>
+                        <li>Natural for tree/graph problems</li>
+                        <li>Easier to understand for some problems</li>
+                        <li>Less code</li>
+                    </ul>
+                    <p><strong>Cons:</strong></p>
+                    <ul>
+                        <li>Uses more memory (call stack)</li>
+                        <li>Slower (function call overhead)</li>
+                        <li>Risk of stack overflow</li>
+                        <li>Can be harder to debug</li>
+                    </ul>
+                </div>
+
+                <div class="comparison-card">
+                    <h4 style="color: #61dafb;">➰ Iteration</h4>
+                    <p><strong>Pros:</strong></p>
+                    <ul>
+                        <li>More memory efficient</li>
+                        <li>Usually faster</li>
+                        <li>No stack overflow risk</li>
+                        <li>Easier to debug</li>
+                    </ul>
+                    <p><strong>Cons:</strong></p>
+                    <ul>
+                        <li>Can be more complex</li>
+                        <li>More code for some problems</li>
+                        <li>Less intuitive for tree/graph problems</li>
+                        <li>Requires manual stack management</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Same Problem, Both Ways:</h3>
+            <div class="code-block"><span class="comment"># RECURSIVE factorial</span>
+<span class="keyword">def</span> <span class="function">factorial_recursive</span>(n):
+    <span class="keyword">if</span> n <= <span class="number">1</span>:
+        <span class="keyword">return</span> <span class="number">1</span>
+    <span class="keyword">return</span> n * factorial_recursive(n - <span class="number">1</span>)
+
+
+<span class="comment"># ITERATIVE factorial</span>
+<span class="keyword">def</span> <span class="function">factorial_iterative</span>(n):
+    result = <span class="number">1</span>
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="keyword">range</span>(<span class="number">1</span>, n + <span class="number">1</span>):
+        result *= i
+    <span class="keyword">return</span> result</div>
+
+            <div class="info-box">
+                <strong>💡 When to use recursion:</strong>
+                <ul>
+                    <li>Working with trees or graphs</li>
+                    <li>Problem naturally divides into similar subproblems</li>
+                    <li>Code clarity is more important than performance</li>
+                    <li>Backtracking problems</li>
+                </ul>
+                <strong>When to use iteration:</strong>
+                <ul>
+                    <li>Simple loops and counting</li>
+                    <li>Performance is critical</li>
+                    <li>Working with large datasets</li>
+                    <li>Memory is limited</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Common Mistakes -->
+        <div class="section">
+            <h2>⚠️ Common Recursion Mistakes</h2>
+
+            <div class="error-box">
+                <h3>❌ Mistake 1: No Base Case</h3>
+                <div class="code-block"><span class="keyword">def</span> <span class="function">bad_countdown</span>(n):
+    <span class="keyword">print</span>(n)
+    bad_countdown(n - <span class="number">1</span>)  <span class="comment"># INFINITE! No stopping condition</span></div>
+                <p><strong>Error:</strong> RecursionError: maximum recursion depth exceeded</p>
+            </div>
+
+            <div class="error-box">
+                <h3>❌ Mistake 2: Not Moving Toward Base Case</h3>
+                <div class="code-block"><span class="keyword">def</span> <span class="function">bad_countdown</span>(n):
+    <span class="keyword">if</span> n == <span class="number">0</span>:
+        <span class="keyword">return</span>
+    <span class="keyword">print</span>(n)
+    bad_countdown(n)  <span class="comment"># INFINITE! n never changes</span></div>
+                <p><strong>Problem:</strong> Never reaches base case because n stays the same!</p>
+            </div>
+
+            <div class="error-box">
+                <h3>❌ Mistake 3: Forgetting to Return</h3>
+                <div class="code-block"><span class="keyword">def</span> <span class="function">bad_factorial</span>(n):
+    <span class="keyword">if</span> n <= <span class="number">1</span>:
+        <span class="keyword">return</span> <span class="number">1</span>
+    n * bad_factorial(n - <span class="number">1</span>)  <span class="comment"># Missing return!</span>
+
+result = bad_factorial(<span class="number">5</span>)
+<span class="keyword">print</span>(result)  <span class="comment"># None - forgot to return the result!</span></div>
+            </div>
+
+            <div class="error-box">
+                <h3>❌ Mistake 4: Modifying Mutable Arguments</h3>
+                <div class="code-block"><span class="keyword">def</span> <span class="function">bad_append</span>(lst, value, result=[]):  <span class="comment"># DON'T use mutable default!</span>
+    <span class="keyword">if</span> <span class="keyword">not</span> lst:
+        <span class="keyword">return</span> result
+    result.append(lst[<span class="number">0</span>])
+    <span class="keyword">return</span> bad_append(lst[<span class="number">1</span>:], value, result)
+
+<span class="comment"># The default result=[] is shared between calls!</span></div>
+                <p><strong>Fix:</strong> Use <code>None</code> as default and create new list inside</p>
+            </div>
+
+            <div class="success-box">
+                <h3>✅ How to Avoid These Mistakes:</h3>
+                <ol>
+                    <li><strong>Always define base case(s) first</strong></li>
+                    <li><strong>Ensure input gets smaller with each call</strong></li>
+                    <li><strong>Remember to return values</strong></li>
+                    <li><strong>Test with small inputs first</strong></li>
+                    <li><strong>Add print statements to trace execution</strong></li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Debugging Tips -->
+        <div class="section">
+            <h2>🐛 Debugging Recursive Functions</h2>
+
+            <h3>Technique 1: Add Tracing</h3>
+            <div class="code-block"><span class="keyword">def</span> <span class="function">factorial</span>(n, depth=<span class="number">0</span>):
+    <span class="comment"># Show depth with indentation</span>
+    indent = <span class="string">"  "</span> * depth
+    <span class="keyword">print</span>(<span class="string">f"</span>{indent}<span class="string">→ factorial(</span>{n}<span class="string">)"</span>)
+    
+    <span class="keyword">if</span> n <= <span class="number">1</span>:
+        <span class="keyword">print</span>(<span class="string">f"</span>{indent}<span class="string">← returning 1"</span>)
+        <span class="keyword">return</span> <span class="number">1</span>
+    
+    result = n * factorial(n - <span class="number">1</span>, depth + <span class="number">1</span>)
+    <span class="keyword">print</span>(<span class="string">f"</span>{indent}<span class="string">← returning </span>{result}<span class="string">"</span>)
+    <span class="keyword">return</span> result
+
+factorial(<span class="number">4</span>)</div>
+
+            <div class="visual-box">
+                <h4>Output with tracing:</h4>
+                <pre style="text-align: left; color: #98c379;">
+→ factorial(4)
+  → factorial(3)
+    → factorial(2)
+      → factorial(1)
+      ← returning 1
+    ← returning 2
+  ← returning 6
+← returning 24
+                </pre>
+            </div>
+
+            <h3>Technique 2: Visualize the Call Stack</h3>
+            <div class="code-block"><span class="keyword">import</span> sys
+
+<span class="keyword">def</span> <span class="function">show_stack</span>():
+    <span class="comment"># Show current call stack depth</span>
+    <span class="keyword">return</span> <span class="keyword">len</span>([frame <span class="keyword">for</span> frame <span class="keyword">in</span> sys._getframe().f_back])
+
+<span class="keyword">def</span> <span class="function">recursive_func</span>(n):
+    <span class="keyword">print</span>(<span class="string">f"Call with n=</span>{n}<span class="string">, stack depth: </span>{show_stack()}<span class="string">"</span>)
+    <span class="keyword">if</span> n <= <span class="number">0</span>:
+        <span class="keyword">return</span>
+    recursive_func(n - <span class="number">1</span>)</div>
+
+            <h3>Technique 3: Test with Small Inputs</h3>
+            <div class="info-box">
+                <p><strong>Always test recursion with the smallest valid inputs first:</strong></p>
+                <ul>
+                    <li>Empty list: <code>[]</code></li>
+                    <li>Single element: <code>[1]</code></li>
+                    <li>Two elements: <code>[1, 2]</code></li>
+                    <li>Base case values: <code>0</code>, <code>1</code></li>
+                </ul>
+                <p>If it works for small cases, it usually works for larger ones!</p>
+            </div>
+        </div>
+
+        <!-- Practice Problems -->
+        <div class="section">
+            <h2>💪 Practice Problems</h2>
+
+            <div class="highlight-box">
+                <h3>🌟 Beginner Problems:</h3>
+                <ol>
+                    <li><strong>Power Function:</strong> Calculate x^n using recursion</li>
+                    <li><strong>Count Digits:</strong> Count the number of digits in an integer</li>
+                    <li><strong>Sum of Digits:</strong> Sum all digits in a number</li>
+                    <li><strong>GCD:</strong> Find greatest common divisor (Euclidean algorithm)</li>
+                    <li><strong>Print Pattern:</strong> Print a pattern like 1, 12, 123, 1234...</li>
+                </ol>
+            </div>
+
+            <div class="highlight-box">
+                <h3>⭐ Intermediate Problems:</h3>
+                <ol>
+                    <li><strong>Binary Search:</strong> Search in sorted array recursively</li>
+                    <li><strong>Tower of Hanoi:</strong> Solve the classic puzzle</li>
+                    <li><strong>Permutations:</strong> Generate all permutations of a string</li>
+                    <li><strong>Subset Sum:</strong> Check if subset with given sum exists</li>
+                    <li><strong>Flatten Nested List:</strong> Convert [[1, 2], [3, [4, 5]]] to [1,2,3,4,5]</li>
+                </ol>
+            </div>
+
+            <div class="highlight-box">
+                <h3>🚀 Advanced Problems:</h3>
+                <ol>
+                    <li><strong>N-Queens:</strong> Place N queens on chessboard</li>
+                    <li><strong>Sudoku Solver:</strong> Solve Sudoku puzzle</li>
+                    <li><strong>Word Break:</strong> Split string into dictionary words</li>
+                    <li><strong>Generate Parentheses:</strong> All valid combinations of n pairs</li>
+                    <li><strong>Path Finding:</strong> Find all paths in a maze</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Solutions to Practice -->
+        <div class="section">
+            <h2>📝 Sample Solutions</h2>
+
+            <button class="collapsible">Solution 1: Power Function</button>
+            <div class="content">
+                <div class="code-block"><span class="keyword">def</span> <span class="function">power</span>(x, n):
+    <span class="string">"""Calculate x^n using recursion"""</span>
+    <span class="comment"># BASE CASE: Anything to power 0 is 1</span>
+    <span class="keyword">if</span> n == <span class="number">0</span>:
+        <span class="keyword">return</span> <span class="number">1</span>
+    
+    <span class="comment"># OPTIMIZATION: Use half the recursion for even powers</span>
+    <span class="keyword">if</span> n % <span class="number">2</span> == <span class="number">0</span>:
+        half = power(x, n // <span class="number">2</span>)
+        <span class="keyword">return</span> half * half
+    <span class="keyword">else</span>:
+        <span class="keyword">return</span> x * power(x, n - <span class="number">1</span>)
+
+<span class="comment"># Test</span>
+<span class="keyword">print</span>(power(<span class="number">2</span>, <span class="number">10</span>))  <span class="comment"># 1024</span>
+<span class="keyword">print</span>(power(<span class="number">5</span>, <span class="number">3</span>))   <span class="comment"># 125</span></div>
+            </div>
+
+            <button class="collapsible">Solution 2: Binary Search</button>
+            <div class="content">
+                <div class="code-block"><span class="keyword">def</span> <span class="function">binary_search</span>(arr, target, left=<span class="number">0</span>, right=<span class="keyword">None</span>):
+    <span class="string">"""Search for target in sorted array"""</span>
+    <span class="keyword">if</span> right <span class="keyword">is</span> <span class="keyword">None</span>:
+        right = <span class="keyword">len</span>(arr) - <span class="number">1</span>
+    
+    <span class="comment"># BASE CASE: Search space is empty</span>
+    <span class="keyword">if</span> left > right:
+        <span class="keyword">return</span> -<span class="number">1</span>
+    
+    <span class="comment"># Find middle element</span>
+    mid = (left + right) // <span class="number">2</span>
+    
+    <span class="comment"># Check if we found it</span>
+    <span class="keyword">if</span> arr[mid] == target:
+        <span class="keyword">return</span> mid
+    
+    <span class="comment"># RECURSIVE CASES: Search left or right half</span>
+    <span class="keyword">if</span> arr[mid] > target:
+        <span class="keyword">return</span> binary_search(arr, target, left, mid - <span class="number">1</span>)
+    <span class="keyword">else</span>:
+        <span class="keyword">return</span> binary_search(arr, target, mid + <span class="number">1</span>, right)
+
+<span class="comment"># Test</span>
+arr = [<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">9</span>, <span class="number">11</span>, <span class="number">13</span>, <span class="number">15</span>]
+<span class="keyword">print</span>(binary_search(arr, <span class="number">7</span>))   <span class="comment"># 3</span>
+<span class="keyword">print</span>(binary_search(arr, <span class="number">10</span>))  <span class="comment"># -1 (not found)</span></div>
+            </div>
+
+            <button class="collapsible">Solution 3: Tower of Hanoi</button>
+            <div class="content">
+                <div class="code-block"><span class="keyword">def</span> <span class="function">tower_of_hanoi</span>(n, source, destination, auxiliary):
+    <span class="string">"""
+    Move n disks from source to destination using auxiliary peg.
+    
+    Args:
+        n: Number of disks
+        source: Starting peg
+        destination: Target peg
+        auxiliary: Helper peg
+    """</span>
+    <span class="comment"># BASE CASE: One disk</span>
+    <span class="keyword">if</span> n == <span class="number">1</span>:
+        <span class="keyword">print</span>(<span class="string">f"Move disk 1 from </span>{source}<span class="string"> to </span>{destination}<span class="string">"</span>)
+        <span class="keyword">return</span>
+    
+    <span class="comment"># RECURSIVE CASE:</span>
+    <span class="comment"># 1. Move n-1 disks from source to auxiliary</span>
+    tower_of_hanoi(n - <span class="number">1</span>, source, auxiliary, destination)
+    
+    <span class="comment"># 2. Move the largest disk from source to destination</span>
+    <span class="keyword">print</span>(<span class="string">f"Move disk </span>{n}<span class="string"> from </span>{source}<span class="string"> to </span>{destination}<span class="string">"</span>)
+    
+    <span class="comment"># 3. Move n-1 disks from auxiliary to destination</span>
+    tower_of_hanoi(n - <span class="number">1</span>, auxiliary, destination, source)
+
+<span class="comment"># Test with 3 disks</span>
+tower_of_hanoi(<span class="number">3</span>, <span class="string">'A'</span>, <span class="string">'C'</span>, <span class="string">'B'</span>)</div>
+            </div>
+
+            <button class="collapsible">Solution 4: Generate All Permutations</button>
+            <div class="content">
+                <div class="code-block"><span class="keyword">def</span> <span class="function">permutations</span>(s):
+    <span class="string">"""Generate all permutations of string s"""</span>
+    <span class="comment"># BASE CASE: Single character or empty</span>
+    <span class="keyword">if</span> <span class="keyword">len</span>(s) <= <span class="number">1</span>:
+        <span class="keyword">return</span> [s]
+    
+    <span class="comment"># RECURSIVE CASE:</span>
+    result = []
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="keyword">range</span>(<span class="keyword">len</span>(s)):
+        <span class="comment"># Pick character at position i</span>
+        current = s[i]
+        
+        <span class="comment"># Get permutations of remaining characters</span>
+        remaining = s[:i] + s[i+<span class="number">1</span>:]
+        
+        <span class="comment"># Add current character to front of each permutation</span>
+        <span class="keyword">for</span> perm <span class="keyword">in</span> permutations(remaining):
+            result.append(current + perm)
+    
+    <span class="keyword">return</span> result
+
+<span class="comment"># Test</span>
+<span class="keyword">print</span>(permutations(<span class="string">"ABC"</span>))
+<span class="comment"># Output: ['ABC', 'ACB', 'BAC', 'BCA', 'CAB', 'CBA']</span></div>
+            </div>
+        </div>
+
+        <!-- Complete Working Example -->
+        <div class="section">
+            <h2>🧪 Complete Test File</h2>
+            <p>Here's a complete Python file you can run to test all the concepts:</p>
+
+            <div class="code-block"><span class="string">"""
+Recursion Examples - Complete Test Suite
+Run this file to see all examples in action!
+"""</span>
+
+<span class="keyword">def</span> <span class="function">section</span>(title):
+    <span class="string">"""Print a section header"""</span>
+    <span class="keyword">print</span>(<span class="string">f"\n{'='*50}"</span>)
+    <span class="keyword">print</span>(<span class="string">f"{title:^50}"</span>)
+    <span class="keyword">print</span>(<span class="string">f"{'='*50}\n"</span>)
+
+
+<span class="comment"># Example 1: Countdown</span>
+<span class="keyword">def</span> <span class="function">countdown</span>(n):
+    <span class="keyword">if</span> n <= <span class="number">0</span>:
+        <span class="keyword">print</span>(<span class="string">"Blastoff! 🚀"</span>)
+        <span class="keyword">return</span>
+    <span class="keyword">print</span>(n)
+    countdown(n - <span class="number">1</span>)
+
+
+<span class="comment"># Example 2: Factorial</span>
+<span class="keyword">def</span> <span class="function">factorial</span>(n):
+    <span class="keyword">if</span> n <= <span class="number">1</span>:
+        <span class="keyword">return</span> <span class="number">1</span>
+    <span class="keyword">return</span> n * factorial(n - <span class="number">1</span>)
+
+
+<span class="comment"># Example 3: Fibonacci</span>
+<span class="keyword">def</span> <span class="function">fibonacci</span>(n):
+    <span class="keyword">if</span> n == <span class="number">0</span>:
+        <span class="keyword">return</span> <span class="number">0</span>
+    <span class="keyword">if</span> n == <span class="number">1</span>:
+        <span class="keyword">return</span> <span class="number">1</span>
+    <span class="keyword">return</span> fibonacci(n - <span class="number">1</span>) + fibonacci(n - <span class="number">2</span>)
+
+
+<span class="comment"># Example 4: Sum of List</span>
+<span class="keyword">def</span> <span class="function">sum_list</span>(numbers):
+    <span class="keyword">if</span> <span class="keyword">len</span>(numbers) == <span class="number">0</span>:
+        <span class="keyword">return</span> <span class="number">0</span>
+    <span class="keyword">return</span> numbers[<span class="number">0</span>] + sum_list(numbers[<span class="number">1</span>:])
+
+
+<span class="comment"># Example 5: Palindrome</span>
+<span class="keyword">def</span> <span class="function">is_palindrome</span>(s):
+    s = s.replace(<span class="string">" "</span>, <span class="string">""</span>).lower()
+    <span class="keyword">if</span> <span class="keyword">len</span>(s) <= <span class="number">1</span>:
+        <span class="keyword">return</span> <span class="keyword">True</span>
+    <span class="keyword">if</span> s[<span class="number">0</span>] != s[-<span class="number">1</span>]:
+        <span class="keyword">return</span> <span class="keyword">False</span>
+    <span class="keyword">return</span> is_palindrome(s[<span class="number">1</span>:-<span class="number">1</span>])
+
+
+<span class="comment"># Example 6: Power</span>
+<span class="keyword">def</span> <span class="function">power</span>(x, n):
+    <span class="keyword">if</span> n == <span class="number">0</span>:
+        <span class="keyword">return</span> <span class="number">1</span>
+    <span class="keyword">if</span> n % <span class="number">2</span> == <span class="number">0</span>:
+        half = power(x, n // <span class="number">2</span>)
+        <span class="keyword">return</span> half * half
+    <span class="keyword">return</span> x * power(x, n - <span class="number">1</span>)
+
+
+<span class="keyword">def</span> <span class="function">main</span>():
+    <span class="comment"># Test 1: Countdown</span>
+    section(<span class="string">"Countdown"</span>)
+    countdown(<span class="number">5</span>)
+    
+    <span class="comment"># Test 2: Factorial</span>
+    section(<span class="string">"Factorial"</span>)
+    <span class="keyword">for</span> n <span class="keyword">in</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">10</span>]:
+        <span class="keyword">print</span>(<span class="string">f"factorial(</span>{n}<span class="string">) = </span>{factorial(n)}<span class="string">"</span>)
+    
+    <span class="comment"># Test 3: Fibonacci</span>
+    section(<span class="string">"Fibonacci Sequence"</span>)
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="keyword">range</span>(<span class="number">10</span>):
+        <span class="keyword">print</span>(<span class="string">f"fib(</span>{i}<span class="string">) = </span>{fibonacci(i)}<span class="string">"</span>, end=<span class="string">"  "</span>)
+    <span class="keyword">print</span>()
+    
+    <span class="comment"># Test 4: Sum of List</span>
+    section(<span class="string">"Sum of List"</span>)
+    test_list = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]
+    <span class="keyword">print</span>(<span class="string">f"sum_list(</span>{test_list}<span class="string">) = </span>{sum_list(test_list)}<span class="string">"</span>)
+    
+    <span class="comment"># Test 5: Palindrome</span>
+    section(<span class="string">"Palindrome Check"</span>)
+    test_words = [<span class="string">"racecar"</span>, <span class="string">"hello"</span>, <span class="string">"A man a plan a canal Panama"</span>]
+    <span class="keyword">for</span> word <span class="keyword">in</span> test_words:
+        result = <span class="string">"✅ YES"</span> <span class="keyword">if</span> is_palindrome(word) <span class="keyword">else</span> <span class="string">"❌ NO"</span>
+        <span class="keyword">print</span>(<span class="string">f'is_palindrome("</span>{word}<span class="string">") = </span>{result}<span class="string">'</span>)
+    
+    <span class="comment"># Test 6: Power</span>
+    section(<span class="string">"Power Function"</span>)
+    <span class="keyword">print</span>(<span class="string">f"2^10 = </span>{power(<span class="number">2</span>, <span class="number">10</span>)}<span class="string">"</span>)
+    <span class="keyword">print</span>(<span class="string">f"5^3 = </span>{power(<span class="number">5</span>, <span class="number">3</span>)}<span class="string">"</span>)
+    <span class="keyword">print</span>(<span class="string">f"10^0 = </span>{power(<span class="number">10</span>, <span class="number">0</span>)}<span class="string">"</span>)
+    
+    section(<span class="string">"All Tests Complete!"</span>)
+
+
+<span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:
+    main()</div>
+
+            <div class="success-box">
+                <strong>🚀 To run this:</strong>
+                <ol>
+                    <li>Save as <code>recursion_examples.py</code></li>
+                    <li>Run: <code>python recursion_examples.py</code></li>
+                    <li>Modify and experiment!</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Final Tips -->
+        <div class="section">
+            <h2>🎓 Final Tips for Mastering Recursion</h2>
+
+            <div class="highlight-box">
+                <div class="highlight-title">💡 The Secret to Understanding Recursion</div>
+                <ol>
+                    <li><strong>Trust the recursion!</strong> Don't try to trace every call in your head. Trust that if it works for n-1, it works for n.</li>
+                    <li><strong>Start with the base case.</strong> Always ask: "What's the simplest case I can solve directly?"</li>
+                    <li><strong>Define the recursive case.</strong> How can I use the solution to a smaller problem to solve this one?</li>
+                    <li><strong>Ensure progress.</strong> Each recursive call must move toward the base case.</li>
+                    <li><strong>Practice with pen and paper.</strong> Draw the call stack for small inputs.</li>
+                </ol>
+            </div>
+
+            <div class="info-box">
+                <strong>📝 The Recursion Checklist:</strong>
+                <ul>
+                    <li>✅ Base case defined and returns a value</li>
+                    <li>✅ Recursive case calls itself with simpler input</li>
+                    <li>✅ Input gets smaller with each call</li>
+                    <li>✅ All return statements are present</li>
+                    <li>✅ Tested with smallest valid inputs</li>
+                </ul>
+            </div>
+
+            <div class="success-box">
+                <h3>🎯 Remember:</h3>
+                <p style="font-size: 1.2em; text-align: center; margin: 20px;">
+                    <strong>"To understand recursion, you must first understand recursion."</strong> 😄
+                </p>
+                <p>The best way to learn recursion is by doing it! Start with simple problems, trace through them carefully, and gradually work your way up to more complex ones.</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="section" style="text-align: center; border: none; background: transparent;">
+            <h2 style="color: #c678dd; border: none;">🎉 You Can Do This!</h2>
+            <p style="font-size: 1.1em; margin-top: 20px;">
+                Recursion might seem magical at first, but it's just a function calling itself with simpler inputs until it reaches a base case. With practice, it becomes second nature!
+            </p>
+            <p style="color: #98c379; margin-top: 20px;">
+                Keep practicing, trust the process, and soon you'll be writing recursive solutions without even thinking about it! 💪
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Make sections collapsible
+        const collapsibles = document.getElementsByClassName("collapsible");
+        for (let i = 0; i < collapsibles.length; i++) {
+            collapsibles[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                const content = this.nextElementSibling;
+                content.classList.toggle("active");
+            });
+        }
+    </script>
+</body>
+</html>
