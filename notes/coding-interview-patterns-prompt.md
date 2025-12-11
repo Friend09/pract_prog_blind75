@@ -56,6 +56,13 @@ Each pattern should be generated as a **separate markdown document** following t
 | 17       | Sort and Search        | Various Sorting Algorithms         | Custom sort, search in matrix, kth largest            | Pending                          |
 | 18       | Bit Manipulation       | Bitwise Operators                  | Single number, counting bits, power of two            | Pending                          |
 | 19       | Math and Geometry      | Number Theory, Coordinate Math     | GCD, primes, points on line, rectangle overlap        | Pending                          |
+| CORE_01  | Recursion              | Function Stack, Call Tree          | DFS, BFS, divide and conquer, backtracking            | Pending                          |
+| CORE_02  | Big-O Analysis         | Asymptotic Notation                | Time/space complexity for code, interview analysis    | Pending                          |
+| CORE_03  | Fundamental Data Structures | Arrays, Linked Lists, Stacks, Queues | Implementation, usage patterns, basics             | Pending                          |
+| CORE_04  | Sorting Algorithms     | Arrays, Comparison/Non-Comparison  | QuickSort, MergeSort, Counting Sort                   | Pending                          |
+| CORE_05  | Searching Algorithms   | Arrays, Trees                      | Linear search, binary search, search in trees         | Pending                          |
+| CORE_06  | Breadth First vs Depth First | Queues, Stacks, Recursion         | BFS vs DFS in trees and graphs, traversal order       | Pending                          |
+| CORE_07  | Hashing Fundamentals   | Hash functions, Tables             | Hash collisions, load factor, design                  | Pending                          |
 
 ---
 
