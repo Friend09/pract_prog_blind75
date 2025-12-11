@@ -50,7 +50,7 @@ Each pattern should be generated as a **separate markdown document** following t
 | 11       | Trees                  | Binary Trees, BST, N-ary Trees     | Traversals, LCA, serialize, path sum                  | Pending                          |
 | 12       | Tries                  | Trie/Prefix Tree                   | Autocomplete, word search, longest prefix             | Pending                          |
 | 13       | Graphs                 | Adjacency List/Matrix, BFS, DFS    | Connected components, shortest path, topological sort | Pending                          |
-| 14       | Backtracking           | Recursion, State Space Tree        | Permutations, combinations, N-Queens, Sudoku          | Pending                          |
+| 14       | Backtracking           | Recursion, State Space Tree        | Permutations, combinations, N-Queens, Sudoku          | module_14_backtracking.md        |
 | 15       | Dynamic Programming    | Memoization, Tabulation            | Fibonacci, knapsack, longest subsequence              | module_15_dynamic_programming.md |
 | 16       | Greedy                 | Sorting, Priority Queues           | Activity selection, huffman, jump game                | module_16_greed.md               |
 | 17       | Sort and Search        | Various Sorting Algorithms         | Custom sort, search in matrix, kth largest            | Pending                          |
