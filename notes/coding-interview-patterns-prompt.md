@@ -35,27 +35,27 @@ Each pattern should be generated as a **separate markdown document** following t
 
 ### Module List
 
-| Module # | Pattern Name           | Key Data Structures                | Typical Problems                                      | Documentation Status          |
-| -------- | ---------------------- | ---------------------------------- | ----------------------------------------------------- | ----------------------------- |
-| 01       | Two Pointers           | Arrays, Strings                    | Pair sum, palindrome, container with water            | Pending                       |
-| 02       | Hash Maps and Sets     | HashMap, HashSet                   | Two sum, anagrams, frequency counting                 | Pending                       |
-| 03       | Linked Lists           | Singly/Doubly Linked Lists         | Reverse, merge, detect cycle                          | Pending                       |
-| 04       | Fast and Slow Pointers | Linked Lists, Arrays               | Cycle detection, middle element, happy number         | Pending                       |
-| 05       | Sliding Window         | Arrays, Strings                    | Subarray sum, longest substring, max in window        | Pending                       |
-| 06       | Binary Search          | Sorted Arrays, Search Space        | Search rotated, find peak, capacity planning          | Pending                       |
-| 07       | Stacks                 | Stack, Monotonic Stack             | Valid parentheses, next greater element, calculator   | Pending                       |
-| 08       | Heaps                  | Min-Heap, Max-Heap, Priority Queue | Top K, merge K lists, median stream                   | Pending                       |
-| 09       | Intervals              | Arrays of Intervals                | Merge intervals, meeting rooms, insert interval       | Pending                       |
-| 10       | Prefix Sums            | Arrays, Cumulative Arrays          | Range sum, subarray equals K, product except self     | Pending                       |
-| 11       | Trees                  | Binary Trees, BST, N-ary Trees     | Traversals, LCA, serialize, path sum                  | Pending                       |
-| 12       | Tries                  | Trie/Prefix Tree                   | Autocomplete, word search, longest prefix             | Pending                       |
-| 13       | Graphs                 | Adjacency List/Matrix, BFS, DFS    | Connected components, shortest path, topological sort | Pending                       |
-| 14       | Backtracking           | Recursion, State Space Tree        | Permutations, combinations, N-Queens, Sudoku          | Pending                       |
-| 15       | Dynamic Programming    | Memoization, Tabulation            | Fibonacci, knapsack, longest subsequence              | module_dynamic_programming.md |
-| 16       | Greedy                 | Sorting, Priority Queues           | Activity selection, huffman, jump game                | Pending                       |
-| 17       | Sort and Search        | Various Sorting Algorithms         | Custom sort, search in matrix, kth largest            | Pending                       |
-| 18       | Bit Manipulation       | Bitwise Operators                  | Single number, counting bits, power of two            | Pending                       |
-| 19       | Math and Geometry      | Number Theory, Coordinate Math     | GCD, primes, points on line, rectangle overlap        | Pending                       |
+| Module # | Pattern Name           | Key Data Structures                | Typical Problems                                      | Documentation Status             |
+| -------- | ---------------------- | ---------------------------------- | ----------------------------------------------------- | -------------------------------- |
+| 01       | Two Pointers           | Arrays, Strings                    | Pair sum, palindrome, container with water            | Pending                          |
+| 02       | Hash Maps and Sets     | HashMap, HashSet                   | Two sum, anagrams, frequency counting                 | Pending                          |
+| 03       | Linked Lists           | Singly/Doubly Linked Lists         | Reverse, merge, detect cycle                          | Pending                          |
+| 04       | Fast and Slow Pointers | Linked Lists, Arrays               | Cycle detection, middle element, happy number         | Pending                          |
+| 05       | Sliding Window         | Arrays, Strings                    | Subarray sum, longest substring, max in window        | Pending                          |
+| 06       | Binary Search          | Sorted Arrays, Search Space        | Search rotated, find peak, capacity planning          | Pending                          |
+| 07       | Stacks                 | Stack, Monotonic Stack             | Valid parentheses, next greater element, calculator   | Pending                          |
+| 08       | Heaps                  | Min-Heap, Max-Heap, Priority Queue | Top K, merge K lists, median stream                   | Pending                          |
+| 09       | Intervals              | Arrays of Intervals                | Merge intervals, meeting rooms, insert interval       | Pending                          |
+| 10       | Prefix Sums            | Arrays, Cumulative Arrays          | Range sum, subarray equals K, product except self     | Pending                          |
+| 11       | Trees                  | Binary Trees, BST, N-ary Trees     | Traversals, LCA, serialize, path sum                  | Pending                          |
+| 12       | Tries                  | Trie/Prefix Tree                   | Autocomplete, word search, longest prefix             | Pending                          |
+| 13       | Graphs                 | Adjacency List/Matrix, BFS, DFS    | Connected components, shortest path, topological sort | Pending                          |
+| 14       | Backtracking           | Recursion, State Space Tree        | Permutations, combinations, N-Queens, Sudoku          | Pending                          |
+| 15       | Dynamic Programming    | Memoization, Tabulation            | Fibonacci, knapsack, longest subsequence              | module_15_dynamic_programming.md |
+| 16       | Greedy                 | Sorting, Priority Queues           | Activity selection, huffman, jump game                | module_16_greed.md               |
+| 17       | Sort and Search        | Various Sorting Algorithms         | Custom sort, search in matrix, kth largest            | Pending                          |
+| 18       | Bit Manipulation       | Bitwise Operators                  | Single number, counting bits, power of two            | Pending                          |
+| 19       | Math and Geometry      | Number Theory, Coordinate Math     | GCD, primes, points on line, rectangle overlap        | Pending                          |
 
 ---
 
